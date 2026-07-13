@@ -1391,26 +1391,126 @@
   }
 
   .skills__grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)) !important;
   }
   .footer__content {
     flex-direction: column;
     gap: var(--space-sm);
     text-align: center;
   }
-  .about__grid {
+}
+
+/* ============================================
+   CORRECTIFS RESPONSIVE — mobile
+   Les grilles ci-dessous sont posées en style
+   inline dans les composants React ; !important
+   est nécessaire ici pour pouvoir les surcharger
+   en dessous des points de rupture.
+   ============================================ */
+
+/* Tablette / petit desktop : on casse déjà le layout
+   admin (sidebar fixe) avant le seuil "mobile" classique */
+@media (max-width: 900px) {
+  .px-dash-layout {
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
+    padding: 2rem 1.25rem !important;
+  }
+
+  .px-dash-sidebar {
+    position: static !important;
+    top: auto !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1.25rem;
+  }
+
+  /* Section À propos */
+  .px-about-grid {
     grid-template-columns: 1fr !important;
     gap: 2.5rem !important;
   }
 
-  .parcours__grid {
-    grid-template-columns: 1fr !important;
-    gap: 2rem !important;
+  .px-about-stats {
+    flex-direction: column !important;
   }
 
-  .hero__grid {
+  /* Section Parcours (public) */
+  .px-parcours-grid {
     grid-template-columns: 1fr !important;
-    gap: 2rem !important;
+    gap: 2.5rem !important;
+  }
+
+  /* Hero */
+  .px-hero-content {
+    grid-template-columns: 1fr !important;
+    gap: 2.5rem !important;
     text-align: center;
+    padding-top: 120px !important;
+    min-height: auto !important;
+  }
+
+  .px-hero-cta {
+    justify-content: center;
+  }
+
+  .px-hero-social {
+    justify-content: center;
+  }
+
+  /* Section Projets (public) */
+  .px-projects-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Dashboard admin */
+  .px-dash-header {
+    padding: 0.75rem 1.25rem !important;
+  }
+
+  .px-dash-header-left,
+  .px-dash-header-right {
+    flex-wrap: wrap;
+  }
+
+  .px-dash-email {
+    display: none;
+  }
+
+  .px-dash-tabpanel {
+    padding: 1.5rem !important;
+  }
+
+  .px-dash-twocol {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+
+  .px-dash-skills-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+  }
+
+  /* Login */
+  .px-login-wrapper {
+    padding: 1rem !important;
+  }
+
+  .px-login-card {
+    padding: 1.75rem !important;
+  }
+}
+
+/* Très petits écrans (ex: iPhone SE, 375px et moins) */
+@media (max-width: 480px) {
+  .certs__grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .px-dash-header-right {
+    justify-content: flex-start !important;
+    width: 100%;
   }
 }

@@ -42,6 +42,7 @@ export default function Login() {
 
   return (
     <div
+      className="px-login-wrapper"
       style={{
         minHeight: "100vh",
         background: "var(--color-bg)",
@@ -71,6 +72,7 @@ export default function Login() {
       />
 
       <motion.div
+        className="px-login-card"
         initial={{ opacity: 0, y: 40, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}

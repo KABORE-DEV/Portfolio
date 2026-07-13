@@ -282,7 +282,7 @@ export default function Projects() {
         </motion.div>
 
         {/* Grille */}
-        <div style={{
+        <div className="px-projects-grid" style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
           gap: "1.5rem",

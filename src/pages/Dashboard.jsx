@@ -242,7 +242,7 @@ function SkillsSection() {
     <div>
       <SectionHeader title="Compétences" count={data.length} onAdd={openAdd} />
       {loading ? <p style={{ color: "var(--color-text-muted)" }}>Chargement...</p> : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "0.6rem" }}>
+        <div className="px-dash-skills-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "0.6rem" }}>
           {data.map((s) => (
             <motion.div key={s.id}
               whileHover={{ background: "var(--glass-bg-hover)", borderColor: "var(--glass-border-hover)" }}
@@ -322,7 +322,7 @@ function ParcoursSection() {
         <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--color-text)", margin: 0 }}>Parcours</h3>
         <p style={{ fontSize: "0.78rem", color: "var(--color-text-muted)", margin: "2px 0 0" }}>Formation et expériences professionnelles</p>
       </div>
-      <div className="dashboard__two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2.5rem" }}>
+      <div className="px-dash-twocol" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2.5rem" }}>
         {renderCol(edu.data, "education", edu.loading)}
         {renderCol(exp.data, "experience", exp.loading)}
       </div>
@@ -412,19 +412,21 @@ export default function Dashboard() {
 
       {/* ── Top Bar ── */}
       <motion.header
+        className="px-dash-header"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         style={{
           position: "sticky", top: 0, zIndex: 100,
-          padding: "0 2rem",
-          height: "64px",
+          padding: "0.75rem 2rem",
+          minHeight: "64px",
           background: "var(--glass-bg)",
           backdropFilter: "blur(20px)",
           borderBottom: "1px solid var(--glass-border)",
           display: "flex", justifyContent: "space-between", alignItems: "center",
+          flexWrap: "wrap", gap: "12px",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+        <div className="px-dash-header-left" style={{ display: "flex", alignItems: "center", gap: "16px" }}>
           <motion.a
             href="/"
             whileHover={{ x: -3, background: "var(--glass-bg-hover)", borderColor: "var(--glass-border-hover)" }}
@@ -454,18 +456,18 @@ export default function Dashboard() {
             Administration
           </span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <span style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>{currentUser?.email}</span>
+        <div className="px-dash-header-right" style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+          <span className="px-dash-email" style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>{currentUser?.email}</span>
           {error && <span style={{ color: "#f87171", fontSize: "0.75rem" }}>{error}</span>}
           <Btn onClick={handleLogout} variant="danger" small>Déconnecter</Btn>
         </div>
       </motion.header>
 
       {/* ── Contenu ── */}
-      <div className="dashboard__layout" style={{ maxWidth: "1280px", margin: "0 auto", padding: "3rem 2rem", display: "grid", gridTemplateColumns: "260px 1fr", gap: "3rem", alignItems: "start" }}>
+      <div className="px-dash-layout" style={{ maxWidth: "1280px", margin: "0 auto", padding: "3rem 2rem", display: "grid", gridTemplateColumns: "260px 1fr", gap: "3rem", alignItems: "start" }}>
 
         {/* Sidebar */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "2rem", position: "sticky", top: "100px" }}>
+        <div className="px-dash-sidebar" style={{ display: "flex", flexDirection: "column", gap: "2rem", position: "sticky", top: "100px" }}>
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} style={{ background: "var(--glass-bg)", backdropFilter: "blur(20px)", borderRadius: "20px", padding: "2rem", border: "1px solid var(--glass-border)", boxShadow: "var(--shadow-md)", position: "relative", overflow: "hidden" }}>
             <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "4px", background: "linear-gradient(90deg, var(--color-accent), var(--color-secondary, #a8b1ff))" }} />
             <p style={{ fontFamily: "var(--font-mono)", fontSize: "0.82rem", color: "var(--color-accent)", marginBottom: "0.5rem" }}>
@@ -512,6 +514,7 @@ export default function Dashboard() {
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
+            className="px-dash-tabpanel"
             initial={{ opacity: 0, y: 15, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -15, scale: 0.98 }}

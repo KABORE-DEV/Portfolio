@@ -126,7 +126,7 @@ export default function About() {
         </motion.div>
 
         {/* Grille : bloc code à gauche, texte à droite */}
-        <div className="about__grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "start" }}>
+        <div className="px-about-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "start" }}>
 
           {/* Gauche : bloc code (à la place de la photo) */}
           <AboutCodeBlock />
@@ -187,7 +187,7 @@ export default function About() {
         </div>
 
         {/* Stats */}
-        <div style={{ display: "flex", gap: "1.25rem", marginTop: "3rem" }}>
+        <div className="px-about-stats" style={{ display: "flex", gap: "1.25rem", marginTop: "3rem" }}>
           {stats.map((s, i) => (
             <motion.div
               key={i}
