@@ -126,7 +126,7 @@ export default function About() {
         </motion.div>
 
         {/* Grille : bloc code à gauche, texte à droite */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "start" }}>
+        <div className="about__grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "start" }}>
 
           {/* Gauche : bloc code (à la place de la photo) */}
           <AboutCodeBlock />

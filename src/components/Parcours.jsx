@@ -89,7 +89,7 @@ export default function Parcours() {
           </h2>
         </motion.div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3rem" }}>
+        <div className="parcours__grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3rem" }}>
           {/* Formation */}
           <div>
             <motion.div

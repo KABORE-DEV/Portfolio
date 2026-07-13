@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { db } from "../firebase";
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
+import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
 
 /** Hook générique pour une collection Firestore */
 export function useCollection(collectionName) {

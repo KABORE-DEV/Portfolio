@@ -1398,4 +1398,19 @@
     gap: var(--space-sm);
     text-align: center;
   }
+  .about__grid {
+    grid-template-columns: 1fr !important;
+    gap: 2.5rem !important;
+  }
+
+  .parcours__grid {
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
+  }
+
+  .hero__grid {
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
+    text-align: center;
+  }
 }

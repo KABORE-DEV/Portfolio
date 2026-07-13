@@ -322,7 +322,7 @@ function ParcoursSection() {
         <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--color-text)", margin: 0 }}>Parcours</h3>
         <p style={{ fontSize: "0.78rem", color: "var(--color-text-muted)", margin: "2px 0 0" }}>Formation et expériences professionnelles</p>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2.5rem" }}>
+      <div className="dashboard__two-col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2.5rem" }}>
         {renderCol(edu.data, "education", edu.loading)}
         {renderCol(exp.data, "experience", exp.loading)}
       </div>
@@ -462,7 +462,7 @@ export default function Dashboard() {
       </motion.header>
 
       {/* ── Contenu ── */}
-      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "3rem 2rem", display: "grid", gridTemplateColumns: "260px 1fr", gap: "3rem", alignItems: "start" }}>
+      <div className="dashboard__layout" style={{ maxWidth: "1280px", margin: "0 auto", padding: "3rem 2rem", display: "grid", gridTemplateColumns: "260px 1fr", gap: "3rem", alignItems: "start" }}>
 
         {/* Sidebar */}
         <div style={{ display: "flex", flexDirection: "column", gap: "2rem", position: "sticky", top: "100px" }}>

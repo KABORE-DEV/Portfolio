@@ -108,7 +108,7 @@ export default function Hero() {
 
       {/* Contenu principal — deux colonnes */}
       <div
-        className="container"
+        className="container,container hero__grid"
         style={{
           display: "grid",
           gridTemplateColumns: "1.1fr 0.9fr",
