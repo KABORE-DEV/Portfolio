@@ -42,7 +42,7 @@ function statusStyle(s) {
 }
 
 /* ════════════════════════════════════════
-   Modal détail projet — style image 3
+   Modal détail projet
 ════════════════════════════════════════ */
 function ProjectModal({ project, onClose }) {
   return (
@@ -75,7 +75,7 @@ function ProjectModal({ project, onClose }) {
           border: "1px solid var(--glass-border)",
         }}
       >
-        {/* ── Header gradient (style image 3) ── */}
+        {/* ── Header (fond uni, adapté au thème) ── */}
         <div style={{
           borderRadius: "24px 24px 0 0",
           background: "var(--color-bg-secondary)",
@@ -84,11 +84,9 @@ function ProjectModal({ project, onClose }) {
           position: "relative",
           overflow: "hidden",
         }}>
-          
-
           <h2 style={{
             fontSize: "1.8rem", fontWeight: 800,
-            color: "#fff", margin: 0, position: "relative",
+            color: "var(--color-text)", margin: 0, position: "relative",
             letterSpacing: "-0.03em", lineHeight: 1.2,
           }}>
             {project.title}
@@ -109,17 +107,17 @@ function ProjectModal({ project, onClose }) {
           {/* Bouton fermer */}
           <motion.button
             onClick={onClose}
-            whileHover={{ scale: 1.1, background: "rgba(255,255,255,0.2)" }}
+            whileHover={{ scale: 1.1, background: "var(--glass-bg-hover)" }}
             whileTap={{ scale: 0.9 }}
             aria-label="Fermer"
             style={{
               position: "absolute", top: "16px", right: "16px",
-              background: "rgba(255,255,255,0.1)",
+              background: "var(--glass-bg)",
               backdropFilter: "blur(8px)",
-              border: "1px solid rgba(255,255,255,0.15)",
+              border: "1px solid var(--glass-border)",
               borderRadius: "50%", width: "38px", height: "38px",
               display: "flex", alignItems: "center", justifyContent: "center",
-              cursor: "pointer", color: "#fff", fontSize: "1.1rem",
+              cursor: "pointer", color: "var(--color-text)", fontSize: "1.1rem",
               fontWeight: 300,
             }}
           >
@@ -236,7 +234,7 @@ function ProjectModal({ project, onClose }) {
 }
 
 /* ════════════════════════════════════════
-   Cartes projet — style image 2
+   Cartes projet
 ════════════════════════════════════════ */
 const cardVariants = {
   hidden: { opacity: 0, y: 40 },
