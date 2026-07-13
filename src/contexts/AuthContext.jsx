@@ -34,11 +34,11 @@ export function AuthProvider({ children }) {
   }, []);
 
   const value = {
-    currentUser,
-    login,
-    logout
-  };
-
+  currentUser,
+  login,
+  logout,
+  loading
+};
   return (
     <AuthContext.Provider value={value}>
       {!loading && children}
