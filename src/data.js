@@ -76,7 +76,7 @@ export const PORTFOLIO = {
     },
     {
       name: "PostgreSql",
-      level: "practiced",
+      level: "learning",
       category: "back",
       context: "Requêtes, modélisation de BDD",
     },
@@ -118,18 +118,17 @@ export const PORTFOLIO = {
       description:
         "Site web d'un média en ligne local — actualités, articles et rubriques culturelles.",
       longDescription:
-        "Plateforme de média en ligne dédiée à la ville de Korsimoro (Burkina Faso). Mise en page moderne avec une architecture multi-rubriques : actualités, culture, société. Site statique déployé sur Vercel.",
+        "Plateforme de média en ligne dédiée à la ville de Korsimoro (Burkina Faso). Mise en page moderne avec une architecture multi-rubriques : actualités, culture, société, avec page administrative pour la gestion des différentes rubriques.",
       features: [
         "Page d'accueil dynamique",
         "Multi-rubriques (culture, société, actu)",
         "Design responsive",
-        "Déployé en ligne",
       ],
-      technologies: ["HTML", "CSS", "JavaScript"],
+      technologies: ["Laravel"],
       github: "https://github.com/KABORE-DEV/Cleaning_Services",
       demo: "https://la-voix-de-korsimoro.vercel.app",
       featured: true,
-      status: "En ligne",
+      status: "En cours",
     },
     {
       title: "Faso Pagnes",
@@ -161,11 +160,12 @@ export const PORTFOLIO = {
         "Gestion des adhérents",
         "Recherche et filtres",
       ],
-      technologies: ["PHP", "MySQL", "HTML", "CSS"],
+      technologies: ["HTML", "CSS", "JavaScript"],
       github:
         "https://github.com/KABORE-DEV/Gestion-Biblith-que-Web-Projet-Academique",
       demo: null,
       featured: true,
+      status: "En cours",
     },
     {
       title: "Gestion de Compte Java",
@@ -202,7 +202,8 @@ export const PORTFOLIO = {
     },
     {
       title: "Morpion en Python",
-      description: "Jeu de morpion (tic-tac-toe) jouable en console, développé en Python.",
+      description:
+        "Jeu de morpion (tic-tac-toe) jouable en console, développé en Python.",
       longDescription:
         "Implémentation du jeu de morpion en Python, jouable en mode console, avec gestion des tours de jeu et détection automatique du gagnant ou du match nul.",
       features: [
@@ -217,7 +218,8 @@ export const PORTFOLIO = {
     },
     {
       title: "Projets en langage C",
-      description: "Recueil de projets et exercices réalisés en cours de langage C.",
+      description:
+        "Recueil de projets et exercices réalisés en cours de langage C.",
       longDescription:
         "Ensemble de programmes en C réalisés dans le cadre de travaux pratiques universitaires : algorithmique, structures de données et manipulation de fichiers.",
       features: [
@@ -249,13 +251,14 @@ export const PORTFOLIO = {
   ],
 
   experience: [
-  {
-    role: "Stage - Développeur Web",
-    company: "Kuilinga Technologies",
-    period: "Juin 2026 - Septembre 2026",
-    description: "Développement d'applications web en utilisant Laravel et React."
-  }
-],
+    {
+      role: "Stage - Développeur Web",
+      company: "Kuilinga Technologies",
+      period: "Juin 2026 - Septembre 2026",
+      description:
+        "Développement d'applications web en utilisant Laravel et React.",
+    },
+  ],
 
   certifications: [
     {
