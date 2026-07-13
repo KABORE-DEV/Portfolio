@@ -78,19 +78,13 @@ function ProjectModal({ project, onClose }) {
         {/* ── Header gradient (style image 3) ── */}
         <div style={{
           borderRadius: "24px 24px 0 0",
-          background: "linear-gradient(160deg, #4c1d95, #1e40af, #0f172a)",
+          background: "var(--color-bg-secondary)",
           padding: "3.5rem 2rem 2.5rem",
           textAlign: "center",
           position: "relative",
           overflow: "hidden",
         }}>
-          {/* Glow subtil */}
-          <div style={{
-            position: "absolute", top: "-40%", left: "50%", transform: "translateX(-50%)",
-            width: "300px", height: "300px", borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(139,92,246,0.3), transparent 70%)",
-            pointerEvents: "none",
-          }} />
+          
 
           <h2 style={{
             fontSize: "1.8rem", fontWeight: 800,
