@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../contexts/AuthContext";
 import { useCollection } from "../hooks/useFirestore";
+import { TECH_ICONS } from "../techIcons.jsx";
 
 /* ═══════════════════════════════════════
    Composants UI réutilisables — Design System
@@ -426,6 +427,10 @@ function SkillsSection() {
     level: "practiced",
     category: "front",
     context: "",
+    iconType: "predefined", // "predefined", "emoji", "url"
+    iconKey: "",
+    iconEmoji: "",
+    iconUrl: "",
   };
   const [form, setForm] = useState(emptyForm);
   const openAdd = () => {
@@ -433,7 +438,11 @@ function SkillsSection() {
     setModal({ mode: "add" });
   };
   const openEdit = (item) => {
-    setForm(item);
+    // S'assurer que les nouveaux champs ont des valeurs par défaut
+    setForm({
+      ...emptyForm,
+      ...item,
+    });
     setModal({ mode: "edit", item });
   };
   const handleSave = async () => {
@@ -527,6 +536,106 @@ function SkillsSection() {
             onChange={(v) => setForm((f) => ({ ...f, name: v }))}
             placeholder="React, Laravel, Python..."
           />
+          <Select
+            label="Type d'icône"
+            value={form.iconType}
+            onChange={(v) => setForm((f) => ({ ...f, iconType: v }))}
+            options={[
+              { value: "predefined", label: "Icône prédéfinie" },
+              { value: "emoji", label: "Emoji" },
+              { value: "url", label: "URL d'image" },
+            ]}
+          />
+
+          {/* Champ selon le type d'icône */}
+          {form.iconType === "predefined" && (
+            <Select
+              label="Icône prédéfinie"
+              value={form.iconKey}
+              onChange={(v) => setForm((f) => ({ ...f, iconKey: v }))}
+              options={[
+                { value: "", label: "Sélectionner une icône..." },
+                ...Object.keys(TECH_ICONS).map((key) => ({ value: key, label: key })),
+              ]}
+            />
+          )}
+
+          {form.iconType === "emoji" && (
+            <Input
+              label="Emoji"
+              value={form.iconEmoji}
+              onChange={(v) => setForm((f) => ({ ...f, iconEmoji: v }))}
+              placeholder="🔥, 💻, 🚀..."
+            />
+          )}
+
+          {form.iconType === "url" && (
+            <Input
+              label="URL de l'icône"
+              value={form.iconUrl}
+              onChange={(v) => setForm((f) => ({ ...f, iconUrl: v }))}
+              placeholder="https://example.com/icon.png"
+            />
+          )}
+
+          {/* Aperçu de l'icône */}
+          <div style={{ marginBottom: "1.1rem" }}>
+            <label
+              style={{
+                display: "block",
+                fontSize: "0.72rem",
+                fontWeight: 600,
+                color: "var(--color-text-muted)",
+                marginBottom: "6px",
+                letterSpacing: "0.04em",
+                textTransform: "uppercase",
+              }}
+            >
+              Aperçu
+            </label>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "1rem",
+                padding: "1rem",
+                background: "var(--glass-bg)",
+                border: "1px solid var(--glass-border)",
+                borderRadius: "10px",
+              }}
+            >
+              <div style={{ width: 44, height: 44, color: "var(--color-text)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                {form.iconType === "predefined" && TECH_ICONS[form.iconKey] ? (
+                  TECH_ICONS[form.iconKey]
+                ) : form.iconType === "emoji" && form.iconEmoji ? (
+                  <span style={{ fontSize: "2rem" }}>{form.iconEmoji}</span>
+                ) : form.iconType === "url" && form.iconUrl ? (
+                  <img
+                    src={form.iconUrl}
+                    alt="Icon preview"
+                    style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
+                ) : (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                  </svg>
+                )}
+              </div>
+              <span style={{ fontSize: "0.85rem", color: "var(--color-text)" }}>
+                {form.iconType === "predefined" && form.iconKey
+                  ? form.iconKey
+                  : form.iconType === "emoji" && form.iconEmoji
+                  ? form.iconEmoji
+                  : form.iconType === "url" && form.iconUrl
+                  ? "URL personnalisée"
+                  : "Aucune icône sélectionnée"}
+              </span>
+            </div>
+          </div>
+
           <Select
             label="Niveau"
             value={form.level}
