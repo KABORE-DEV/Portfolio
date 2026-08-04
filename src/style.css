@@ -9,6 +9,31 @@
   padding: 0 var(--space-xl);
 }
 
+/* --- Barre de défilement (Scrollbar) subtile --- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* Pour Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
 .section {
   padding: var(--section-padding) 0;
   position: relative;
