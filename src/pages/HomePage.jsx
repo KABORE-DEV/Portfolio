@@ -8,8 +8,8 @@ import ProjectModal from "../components/ProjectModal.jsx";
 const SERVICES = [
   { title: "Sites web", desc: "Des vitrines élégantes, rapides et responsives.", tag: "React · Laravel" },
   { title: "Applications", desc: "Des interfaces web & mobiles pensées pour l'usage.", tag: "Mobile · PWA" },
-  { title: "UI / UX", desc: "Des designs chics, clairs et agréables à regarder.", tag: "Stitch · Figma" },
-  { title: "Back-end & API", desc: "Des données bien rangées et des API qui répondent.", tag: "PHP · Firebase" },
+  /*{ title: "UI / UX", desc: "Des designs chics, clairs et agréables à regarder.", tag: "Stitch · Figma" },*/
+  /*{ title: "Back-end & API", desc: "Des données bien rangées et des API qui répondent.", tag: "PHP · Firebase" },*/
   { title: "Bases de données", desc: "Modélisation propre, requêtes qui vont vite.", tag: "MySQL · PostgreSQL" },
   { title: "Git & déploiement", desc: "Un workflow propre, du code versionné et en ligne.", tag: "GitHub · Vercel" },
 ];
@@ -47,7 +47,6 @@ export default function HomePage({ onNavigate }) {
       <section className="hero">
         <div className="container hero-grid">
           <div>
-            <p className="hero-eyebrow">Disponible</p>
             <h1 className="hero-title">
               Salut, moi c'est <em>{firstName}</em>.
               <span className="hero-line2">Je crée des expériences web <em>chics &amp; malines.</em></span>
@@ -201,7 +200,7 @@ export default function HomePage({ onNavigate }) {
           <div className="cta-panel">
             <div>
               <h2 className="cta-title">Une idée ? Un projet ? <em>Parlons-en.</em></h2>
-              <p className="cta-sub">Disponible pour toute collaboration, toujours partant pour échanger. Un café virtuel et c'est parti.</p>
+              <p className="cta-sub">Disponible pour toute collaboration, toujours partant pour échanger.</p>
             </div>
             <button className="btn btn-primary" onClick={() => onNavigate("contact")}>
               Travaillons ensemble <ArrowUpRightIcon width={15} height={15} />

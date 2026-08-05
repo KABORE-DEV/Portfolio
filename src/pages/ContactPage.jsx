@@ -75,7 +75,7 @@ export default function ContactPage() {
           {/* ── Formulaire ────────────────── */}
           <div className="form-card">
             <h2>Écrivez-moi</h2>
-            <p className="form-intro">Réponse garantie sous 24h — promis juré. ✦</p>
+            <p className="form-intro">Réponse garantie sous 24h — promis juré.</p>
 
             <form onSubmit={handleSubmit} noValidate>
               <div className="form-grid2">

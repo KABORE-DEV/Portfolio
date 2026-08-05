@@ -23,7 +23,7 @@ export default function Footer() {
             </p>
             <p className="footer-credit-sub">
               © {year} {firstName} {lastName} — fait maison, de la première ligne de code au dernier pixel,
-              avec beaucoup de café et un peu de folie. ✦
+              avec beaucoup de café et un peu de folie.
             </p>
           </div>
 
