@@ -2,8 +2,8 @@
   position: fixed;
   bottom: 2rem;
   right: 2rem;
-  background: var(--color-accent);
-  color: var(--color-bg);
+  background: var(--accent);
+  color: #fff;
   width: 45px;
   height: 45px;
   border-radius: 50%;
@@ -17,7 +17,7 @@
   visibility: hidden;
   transform: translateY(20px);
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(34, 211, 238, 0.4);
+  box-shadow: var(--shadow-sm);
 }
 
 .scroll-to-top.is-visible {
@@ -27,9 +27,9 @@
 }
 
 .scroll-to-top:hover {
-  background: var(--color-accent-light);
+  background: var(--accent-dark);
   transform: translateY(-5px);
-  box-shadow: 0 6px 16px rgba(34, 211, 238, 0.6);
+  box-shadow: var(--shadow-md);
 }
 
 .scroll-to-top svg {

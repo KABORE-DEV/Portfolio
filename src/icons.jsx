@@ -35,32 +35,6 @@ export function WhatsappIcon(props) {
   )
 }
 
-export function MailIcon(props) {
-  return (
-    <svg {...base} {...props} aria-hidden="true">
-      <rect x="2" y="4" width="20" height="16" rx="2" />
-      <path d="m22 7-10 6L2 7" />
-    </svg>
-  )
-}
-
-export function PhoneIcon(props) {
-  return (
-    <svg {...base} {...props} aria-hidden="true">
-      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" />
-    </svg>
-  )
-}
-
-export function MapPinIcon(props) {
-  return (
-    <svg {...base} {...props} aria-hidden="true">
-      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-      <circle cx="12" cy="10" r="3" />
-    </svg>
-  )
-}
-
 export function ArrowUpRightIcon(props) {
   return (
     <svg {...base} {...props} aria-hidden="true">
@@ -79,36 +53,48 @@ export function ArrowDownIcon(props) {
   )
 }
 
-export function CheckIcon(props) {
-  return (
-    <svg {...base} {...props} aria-hidden="true">
-      <path d="M20 6 9 17l-5-5" />
-    </svg>
-  )
-}
-
-export function StarIcon(props) {
-  return (
-    <svg {...base} {...props} aria-hidden="true">
-      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-    </svg>
-  )
-}
-
-export function CodeIcon(props) {
-  return (
-    <svg {...base} {...props} aria-hidden="true">
-      <path d="m16 18 6-6-6-6" />
-      <path d="m8 6-6 6 6 6" />
-    </svg>
-  )
-}
-
 export function GraduationIcon(props) {
   return (
     <svg {...base} {...props} aria-hidden="true">
       <path d="M22 10 12 5 2 10l10 5 10-5z" />
       <path d="M6 12v5c0 1 2.5 2.5 6 2.5s6-1.5 6-2.5v-5" />
+    </svg>
+  )
+}
+
+export function RocketIcon(props) {
+  return (
+    <svg {...base} {...props} aria-hidden="true">
+      <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+      <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+      <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+      <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+    </svg>
+  )
+}
+
+export function ZapIcon(props) {
+  return (
+    <svg {...base} {...props} aria-hidden="true">
+      <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" />
+    </svg>
+  )
+}
+
+export function BriefcaseIcon(props) {
+  return (
+    <svg {...base} {...props} aria-hidden="true">
+      <rect x="2" y="7" width="20" height="14" rx="2" />
+      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+    </svg>
+  )
+}
+
+export function AwardIcon(props) {
+  return (
+    <svg {...base} {...props} aria-hidden="true">
+      <circle cx="12" cy="8" r="6" />
+      <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" />
     </svg>
   )
 }

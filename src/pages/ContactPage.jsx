@@ -1,0 +1,152 @@
+import { useState } from "react";
+import { PORTFOLIO } from "../data.js";
+import { GithubIcon, LinkedinIcon, WhatsappIcon, ArrowUpRightIcon } from "../icons.jsx";
+
+export default function ContactPage() {
+  const { email, phone, location } = PORTFOLIO.personal;
+  const { github, linkedin, whatsapp } = PORTFOLIO.social;
+
+  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const [status, setStatus] = useState(null); // null | "ok" | "err"
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const subject = encodeURIComponent(form.subject || `Message de ${form.name || "un visiteur"}`);
+    const body = encodeURIComponent(`${form.message}\n\n— ${form.name} (${form.email})`);
+    const mailto = `mailto:${email}?subject=${subject}&body=${body}`;
+    window.location.href = mailto;
+    setStatus("ok");
+    setForm({ name: "", email: "", subject: "", message: "" });
+    setTimeout(() => setStatus(null), 6000);
+  };
+
+  const socials = [
+    { href: github,   icon: <GithubIcon width={16} height={16} />,   label: "GitHub" },
+    { href: linkedin, icon: <LinkedinIcon width={16} height={16} />,  label: "LinkedIn" },
+    { href: whatsapp, icon: <WhatsappIcon width={16} height={16} />,  label: "WhatsApp" },
+  ].filter(s => s.href);
+
+  return (
+    <>
+      {/* ═══ HEADER ═════════════════════════ */}
+      <div className="page-head">
+        <div className="container">
+          <span className="section-num">Contact</span>
+          <h1 className="section-title">Travaillons <em>ensemble.</em></h1>
+          <p className="section-desc">
+            Une collaboration, un projet, ou simplement envie de discuter — ma boîte mail est ouverte.
+          </p>
+        </div>
+      </div>
+
+      <div className="section" style={{ paddingTop: "1rem" }}>
+        <div className="container contact-grid">
+          {/* ── Infos ─────────────────────── */}
+          <div>
+            <div className="contact-list">
+              <div className="contact-item">
+                <span className="k">Email</span>
+                <div className="v">
+                  <a className="email-big" href={`mailto:${email}`}>{email}</a>
+                </div>
+              </div>
+              <div className="contact-item">
+                <span className="k">Téléphone</span>
+                <span className="v">{phone}</span>
+              </div>
+              <div className="contact-item">
+                <span className="k">Localisation</span>
+                <span className="v">{location}</span>
+              </div>
+            </div>
+
+            <p style={{ fontFamily: "var(--mono)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--text-3)", margin: "2.25rem 0 1rem" }}>
+              Réseaux
+            </p>
+            <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
+              {socials.map(s => (
+                <a key={s.label} className="social-chip" href={s.href} target="_blank" rel="noreferrer">
+                  {s.icon} {s.label}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* ── Formulaire ────────────────── */}
+          <div className="form-card">
+            <h2>Écrivez-moi</h2>
+            <p className="form-intro">Réponse garantie sous 24h — promis juré. ✦</p>
+
+            <form onSubmit={handleSubmit} noValidate>
+              <div className="form-grid2">
+                <div className="field">
+                  <label htmlFor="c-name">Nom</label>
+                  <input
+                    id="c-name"
+                    className="input"
+                    value={form.name}
+                    onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                    placeholder="Votre nom"
+                    required
+                  />
+                </div>
+                <div className="field">
+                  <label htmlFor="c-email">Email</label>
+                  <input
+                    id="c-email"
+                    type="email"
+                    className="input"
+                    value={form.email}
+                    onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                    placeholder="vous@email.com"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="field">
+                <label htmlFor="c-subject">Sujet</label>
+                <input
+                  id="c-subject"
+                  className="input"
+                  value={form.subject}
+                  onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
+                  placeholder="De quoi voulez-vous parler ?"
+                  required
+                />
+              </div>
+
+              <div className="field">
+                <label htmlFor="c-message">Message</label>
+                <textarea
+                  id="c-message"
+                  className="textarea"
+                  rows={5}
+                  value={form.message}
+                  onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
+                  placeholder="Décrivez votre projet ou votre demande…"
+                  required
+                />
+              </div>
+
+              <button type="submit" className="btn btn-primary btn-block" style={{ marginTop: "0.5rem" }}>
+                Envoyer le message <ArrowUpRightIcon width={15} height={15} />
+              </button>
+
+              {status === "ok" && (
+                <p className="form-status ok" style={{ marginTop: "1rem" }}>
+                  Message prêt à partir ! Votre client mail s'est ouvert. ✦
+                </p>
+              )}
+              {status === "err" && (
+                <p className="form-status err" style={{ marginTop: "1rem" }}>
+                  Une erreur s'est produite. Réessayez.
+                </p>
+              )}
+            </form>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}

@@ -3,12 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState("dark");
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("portfolio-theme") || "dark";
-    setTheme(savedTheme);
-  }, []);
+  const [theme, setTheme] = useState(() => localStorage.getItem("portfolio-theme") || "dark");
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -27,5 +22,9 @@ export function ThemeProvider({ children }) {
 }
 
 export function useTheme() {
-  return useContext(ThemeContext);
+  const context = useContext(ThemeContext);
+  if (!context) {
+    return { theme: "light", toggleTheme: () => {} };
+  }
+  return context;
 }

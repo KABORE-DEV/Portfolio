@@ -10,19 +10,12 @@ export const PORTFOLIO = {
     firstName: "Frank",
     lastName: "KABORE",
     title: "Étudiant en Génie Logiciel",
-    subtitle: "3ème année · Passionné par le développement web & mobile",
     email: "kabore.dev@gmail.com",
     phone: "+226 52 76 62 73 / 06 41 84 57",
     location: "Burkina Faso · Bobo-Dioulasso",
     bio: `Étudiant en 3ème année de génie logiciel, je suis passionné par la création d'applications web et mobiles. J'aime transformer des idées en solutions concrètes et apprendre de nouvelles technologies.`,
     initials: "FK",
-    photo: "/WhatsApp Image 2026-05-19 at 19.51.08.jpeg",
-  },
-
-  skillLevels: {
-    learning: "En cours",
-    familiar: "À l'aise",
-    practiced: "Utilisé en projet",
+    photo: "/frank.jpg",
   },
 
   social: {
@@ -105,12 +98,6 @@ export const PORTFOLIO = {
       context: "Maquettes et prototypage UI",
     },
   ],
-
-  categories: {
-    front: "Front-end",
-    back: "Back-end",
-    tools: "Outils",
-  },
 
   projects: [
     {
@@ -285,15 +272,5 @@ export const PORTFOLIO = {
       date: "Décembre 2024",
       url: "https://www.netacad.com/profile?tab=badges",
     },
-  ],
-
-  nav: [
-    { id: "accueil", label: "Accueil" },
-    { id: "apropos", label: "À propos" },
-    { id: "competences", label: "Compétences" },
-    { id: "projets", label: "Projets" },
-    { id: "parcours", label: "Parcours" },
-    { id: "certifications", label: "Certifications" },
-    { id: "contact", label: "Contact" },
   ],
 };

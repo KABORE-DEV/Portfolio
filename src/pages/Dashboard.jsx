@@ -1,57 +1,62 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../contexts/AuthContext";
 import { useCollection } from "../hooks/useFirestore";
 import { TECH_ICONS } from "../techIcons.jsx";
+import { RocketIcon, ZapIcon, GraduationIcon, BriefcaseIcon, AwardIcon } from "../icons.jsx";
+import { PORTFOLIO } from "../data.js";
 
 /* ═══════════════════════════════════════
-   Composants UI réutilisables — Design System
+   Composants UI réutilisables — Design System minimaliste
 ═══════════════════════════════════════ */
 
 const inputStyle = {
   width: "100%",
-  padding: "11px 14px",
-  background: "var(--glass-bg)",
-  border: "1px solid var(--glass-border)",
-  borderRadius: "10px",
-  color: "var(--color-text)",
+  padding: "10px 12px",
+  background: "var(--bg)",
+  border: "1px solid var(--border)",
+  borderRadius: "var(--r-md)",
+  color: "var(--text)",
   fontSize: "0.875rem",
+  fontFamily: "var(--font)",
   outline: "none",
-  transition: "border-color 0.2s, box-shadow 0.2s",
+  transition: "border-color var(--fast), box-shadow var(--fast)",
   boxSizing: "border-box",
-  backdropFilter: "blur(8px)",
+};
+
+const labelStyle = {
+  display: "block",
+  fontFamily: "var(--mono)",
+  fontSize: "0.7rem",
+  fontWeight: 700,
+  color: "var(--text-2)",
+  marginBottom: "6px",
+  letterSpacing: "0.1em",
+  textTransform: "uppercase",
+};
+
+const focusOn = (e) => {
+  e.target.style.borderColor = "var(--accent)";
+  e.target.style.boxShadow = "0 0 0 3px var(--accent-glow)";
+};
+const focusOff = (e) => {
+  e.target.style.borderColor = "var(--border)";
+  e.target.style.boxShadow = "none";
 };
 
 function Input({ label, value, onChange, type = "text", placeholder }) {
   return (
     <div style={{ marginBottom: "1.1rem" }}>
-      <label
-        style={{
-          display: "block",
-          fontSize: "0.72rem",
-          fontWeight: 600,
-          color: "var(--color-text-muted)",
-          marginBottom: "6px",
-          letterSpacing: "0.04em",
-          textTransform: "uppercase",
-        }}
-      >
-        {label}
-      </label>
+      <label style={labelStyle}>{label}</label>
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         style={inputStyle}
-        onFocus={(e) => {
-          e.target.style.borderColor = "var(--color-accent)";
-          e.target.style.boxShadow = "0 0 0 3px var(--color-accent-glow)";
-        }}
-        onBlur={(e) => {
-          e.target.style.borderColor = "var(--glass-border)";
-          e.target.style.boxShadow = "none";
-        }}
+        onFocus={focusOn}
+        onBlur={focusOff}
       />
     </div>
   );
@@ -60,33 +65,15 @@ function Input({ label, value, onChange, type = "text", placeholder }) {
 function TextArea({ label, value, onChange, placeholder, rows = 3 }) {
   return (
     <div style={{ marginBottom: "1.1rem" }}>
-      <label
-        style={{
-          display: "block",
-          fontSize: "0.72rem",
-          fontWeight: 600,
-          color: "var(--color-text-muted)",
-          marginBottom: "6px",
-          letterSpacing: "0.04em",
-          textTransform: "uppercase",
-        }}
-      >
-        {label}
-      </label>
+      <label style={labelStyle}>{label}</label>
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         rows={rows}
         style={{ ...inputStyle, resize: "vertical" }}
-        onFocus={(e) => {
-          e.target.style.borderColor = "var(--color-accent)";
-          e.target.style.boxShadow = "0 0 0 3px var(--color-accent-glow)";
-        }}
-        onBlur={(e) => {
-          e.target.style.borderColor = "var(--glass-border)";
-          e.target.style.boxShadow = "none";
-        }}
+        onFocus={focusOn}
+        onBlur={focusOff}
       />
     </div>
   );
@@ -95,37 +82,19 @@ function TextArea({ label, value, onChange, placeholder, rows = 3 }) {
 function Select({ label, value, onChange, options }) {
   return (
     <div style={{ marginBottom: "1.1rem" }}>
-      <label
-        style={{
-          display: "block",
-          fontSize: "0.72rem",
-          fontWeight: 600,
-          color: "var(--color-text-muted)",
-          marginBottom: "6px",
-          letterSpacing: "0.04em",
-          textTransform: "uppercase",
-        }}
-      >
-        {label}
-      </label>
+      <label style={labelStyle}>{label}</label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
         style={{ ...inputStyle, cursor: "pointer" }}
-        onFocus={(e) => {
-          e.target.style.borderColor = "var(--color-accent)";
-          e.target.style.boxShadow = "0 0 0 3px var(--color-accent-glow)";
-        }}
-        onBlur={(e) => {
-          e.target.style.borderColor = "var(--glass-border)";
-          e.target.style.boxShadow = "none";
-        }}
+        onFocus={focusOn}
+        onBlur={focusOff}
       >
         {options.map((o) => (
           <option
             key={o.value}
             value={o.value}
-            style={{ background: "var(--color-bg)" }}
+            style={{ background: "var(--bg)" }}
           >
             {o.label}
           </option>
@@ -137,40 +106,48 @@ function Select({ label, value, onChange, options }) {
 
 function Btn({ onClick, children, variant = "primary", small = false }) {
   const base = {
-    border: "none",
-    borderRadius: small ? "8px" : "10px",
-    fontSize: small ? "0.75rem" : "0.85rem",
-    fontWeight: 600,
+    border: "1px solid transparent",
+    borderRadius: "var(--r-md)",
+    fontSize: small ? "0.68rem" : "0.75rem",
+    fontFamily: "var(--mono)",
+    fontWeight: 700,
+    letterSpacing: "0.06em",
+    textTransform: "uppercase",
     cursor: "pointer",
-    padding: small ? "5px 12px" : "10px 20px",
-    transition: "all 0.2s",
+    padding: small ? "6px 12px" : "10px 20px",
+    transition: "all var(--fast)",
     display: "inline-flex",
     alignItems: "center",
     gap: "6px",
+    whiteSpace: "nowrap",
   };
   const variants = {
-    primary: { background: "var(--color-accent)", color: "#fff" },
+    primary: {
+      background: "var(--accent)",
+      color: "#fff",
+      borderColor: "var(--accent)",
+    },
     ghost: {
-      background: "var(--glass-bg)",
-      color: "var(--color-text)",
-      border: "1px solid var(--glass-border)",
+      background: "transparent",
+      color: "var(--text)",
+      borderColor: "var(--border)",
     },
     danger: {
-      background: "rgba(248,113,113,0.1)",
-      color: "#f87171",
-      border: "1px solid rgba(248,113,113,0.25)",
+      background: "transparent",
+      color: "#e5484d",
+      borderColor: "rgba(229,72,77,0.4)",
     },
     accent: {
-      background: "var(--color-accent-glow)",
-      color: "var(--color-accent-light)",
-      border: "1px solid var(--color-accent)",
+      background: "var(--accent-glow)",
+      color: "var(--accent)",
+      borderColor: "var(--accent)",
     },
   };
   return (
     <motion.button
       onClick={onClick}
-      whileHover={{ scale: 1.04 }}
-      whileTap={{ scale: 0.96 }}
+      whileHover={{ y: -1 }}
+      whileTap={{ scale: 0.97 }}
       style={{ ...base, ...variants[variant] }}
     >
       {children}
@@ -179,9 +156,21 @@ function Btn({ onClick, children, variant = "primary", small = false }) {
 }
 
 function Modal({ title, onClose, children }) {
-  return (
+  useEffect(() => {
+    const onKey = (e) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [onClose]);
+
+  return createPortal(
     <AnimatePresence>
       <motion.div
+        className="px-modal-overlay"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -199,15 +188,16 @@ function Modal({ title, onClose, children }) {
           style={{
             position: "absolute",
             inset: 0,
-            background: "rgba(0,0,0,0.7)",
-            backdropFilter: "blur(12px)",
+            background: "rgba(20, 20, 18, 0.5)",
+            backdropFilter: "blur(4px)",
           }}
           onClick={onClose}
         />
         <motion.div
-          initial={{ opacity: 0, scale: 0.92, y: 30 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.92, y: 30 }}
+          className="px-modal-panel"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 24 }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
           style={{
             position: "relative",
@@ -215,9 +205,9 @@ function Modal({ title, onClose, children }) {
             maxWidth: "520px",
             maxHeight: "88vh",
             overflowY: "auto",
-            background: "var(--color-bg)",
-            border: "1px solid var(--glass-border)",
-            borderRadius: "20px",
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
+            borderRadius: "var(--r-xl)",
             padding: "2rem",
             boxShadow: "var(--shadow-lg)",
           }}
@@ -227,14 +217,19 @@ function Modal({ title, onClose, children }) {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              marginBottom: "1.75rem",
+              marginBottom: "1.5rem",
+              paddingBottom: "1rem",
+              borderBottom: "1px solid var(--border)",
             }}
           >
             <h3
               style={{
-                fontSize: "1.1rem",
-                fontWeight: 700,
-                color: "var(--color-text)",
+                fontFamily: "var(--font-head)",
+                fontSize: "1.35rem",
+                fontWeight: 600,
+                letterSpacing: "-0.02em",
+                color: "var(--text)",
+                margin: 0,
               }}
             >
               {title}
@@ -242,17 +237,26 @@ function Modal({ title, onClose, children }) {
             <button
               onClick={onClose}
               style={{
-                background: "var(--glass-bg)",
-                border: "1px solid var(--glass-border)",
-                color: "var(--color-text-muted)",
+                background: "transparent",
+                border: "1px solid var(--border)",
+                color: "var(--text-2)",
                 cursor: "pointer",
-                width: "32px",
-                height: "32px",
-                borderRadius: "8px",
-                fontSize: "1rem",
+                width: "30px",
+                height: "30px",
+                borderRadius: "var(--r-full)",
+                fontSize: "0.85rem",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                transition: "all var(--fast)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = "var(--accent)";
+                e.currentTarget.style.borderColor = "var(--accent)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = "var(--text-2)";
+                e.currentTarget.style.borderColor = "var(--border)";
               }}
             >
               ✕
@@ -261,7 +265,8 @@ function Modal({ title, onClose, children }) {
           {children}
         </motion.div>
       </motion.div>
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }
 
@@ -271,12 +276,47 @@ function Modal({ title, onClose, children }) {
 
 function SectionHeader({ title, count, onAdd }) {
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+    <div
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "0.75rem",
+        justifyContent: "space-between",
+        alignItems: "flex-end",
+        marginBottom: "1.5rem",
+        paddingBottom: "1.1rem",
+        borderBottom: "1px solid var(--border)",
+      }}
+    >
       <div>
-        <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--color-text)", margin: 0 }}>{title}</h3>
-        <p style={{ fontSize: "0.78rem", color: "var(--color-text-muted)", margin: "2px 0 0" }}>{count} élément{count !== 1 ? "s" : ""}</p>
+        <h3
+          style={{
+            fontFamily: "var(--font-head)",
+            fontSize: "1.45rem",
+            fontWeight: 600,
+            letterSpacing: "-0.02em",
+            color: "var(--text)",
+            margin: 0,
+          }}
+        >
+          {title}
+        </h3>
+        <p
+          style={{
+            fontFamily: "var(--mono)",
+            fontSize: "0.68rem",
+            color: "var(--text-2)",
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            margin: "4px 0 0",
+          }}
+        >
+          {count} élément{count !== 1 ? "s" : ""}
+        </p>
       </div>
-      <Btn onClick={onAdd} variant="primary">+ Ajouter</Btn>
+      <Btn onClick={onAdd} variant="primary" small>
+        + Ajouter
+      </Btn>
     </div>
   );
 }
@@ -284,20 +324,62 @@ function SectionHeader({ title, count, onAdd }) {
 function ListRow({ main, sub, onEdit, onDelete }) {
   return (
     <motion.div
-      whileHover={{ background: "var(--glass-bg-hover)", borderColor: "var(--glass-border-hover)" }}
-      style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "0.75rem", padding: "1rem 1.25rem", background: "var(--glass-bg)", border: "1px solid var(--glass-border)", borderRadius: "12px", backdropFilter: "blur(8px)" }}
+      whileHover={{ background: "var(--surface-2)" }}
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        justifyContent: "space-between",
+        alignItems: "center",
+        gap: "0.75rem",
+        padding: "0.9rem 0.5rem",
+        borderBottom: "1px solid var(--border)",
+      }}
     >
       <div style={{ minWidth: 0, flex: "1 1 160px" }}>
-        <p style={{ fontWeight: 600, color: "var(--color-text)", fontSize: "0.9rem", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{main}</p>
-        {sub && <p style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginTop: "2px", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{sub}</p>}
+        <p
+          style={{
+            fontWeight: 600,
+            color: "var(--text)",
+            fontSize: "0.92rem",
+            margin: 0,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {main}
+        </p>
+        {sub && (
+          <p
+            style={{
+              fontFamily: "var(--mono)",
+              fontSize: "0.72rem",
+              color: "var(--text-2)",
+              marginTop: "3px",
+              margin: 0,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {sub}
+          </p>
+        )}
       </div>
-      <div style={{ display: "flex", gap: "8px", marginLeft: "auto", flexShrink: 0 }}>
+      <div style={{ display: "flex", gap: "0.5rem", marginLeft: "auto", flexShrink: 0 }}>
         <Btn onClick={onEdit} variant="accent" small>Modifier</Btn>
         <Btn onClick={onDelete} variant="danger" small>Supprimer</Btn>
       </div>
     </motion.div>
   );
 }
+
+const listContainerStyle = {
+  display: "flex",
+  flexDirection: "column",
+  borderTop: "1px solid var(--border)",
+};
+
 function ProjectsSection() {
   const { data, loading, add, update, remove } = useCollection("projects");
   const [modal, setModal] = useState(null);
@@ -340,11 +422,9 @@ function ProjectsSection() {
     <div>
       <SectionHeader title="Projets" count={data.length} onAdd={openAdd} />
       {loading ? (
-        <p style={{ color: "var(--color-text-muted)" }}>Chargement...</p>
+        <p style={{ color: "var(--text-2)" }}>Chargement...</p>
       ) : (
-        <div
-          style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}
-        >
+        <div style={listContainerStyle}>
           {data.map((p) => (
             <ListRow
               key={p.id}
@@ -427,9 +507,8 @@ function SkillsSection() {
     level: "practiced",
     category: "front",
     context: "",
-    iconType: "predefined", // "predefined", "emoji", "url"
+    iconType: "predefined", // "predefined", "url"
     iconKey: "",
-    iconEmoji: "",
     iconUrl: "",
   };
   const [form, setForm] = useState(emptyForm);
@@ -455,29 +534,28 @@ function SkillsSection() {
     <div>
       <SectionHeader title="Compétences" count={data.length} onAdd={openAdd} />
       {loading ? (
-        <p style={{ color: "var(--color-text-muted)" }}>Chargement...</p>
+        <p style={{ color: "var(--text-2)" }}>Chargement...</p>
       ) : (
         <div
           className="px-dash-skills-grid"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
-            gap: "0.6rem",
+            gap: "0.75rem",
           }}
         >
           {data.map((s) => (
             <motion.div
               key={s.id}
-              whileHover={{
-                background: "var(--glass-bg-hover)",
-                borderColor: "var(--glass-border-hover)",
-              }}
+              whileHover={{ borderColor: "var(--accent)" }}
               style={{
                 padding: "1rem 1.1rem",
                 background: "var(--glass-bg)",
+                backdropFilter: "blur(var(--glass-blur)) saturate(150%)",
+                WebkitBackdropFilter: "blur(var(--glass-blur)) saturate(150%)",
                 border: "1px solid var(--glass-border)",
-                borderRadius: "12px",
-                backdropFilter: "blur(8px)",
+                borderRadius: "var(--r-lg)",
+                transition: "border-color var(--fast)",
               }}
             >
               <div
@@ -491,7 +569,7 @@ function SkillsSection() {
                 <p
                   style={{
                     fontWeight: 600,
-                    color: "var(--color-text)",
+                    color: "var(--text)",
                     fontSize: "0.875rem",
                     margin: 0,
                   }}
@@ -501,9 +579,11 @@ function SkillsSection() {
               </div>
               <p
                 style={{
-                  fontSize: "0.72rem",
-                  color: "var(--color-text-muted)",
-                  marginBottom: "10px",
+                  fontFamily: "var(--mono)",
+                  fontSize: "0.68rem",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                  color: "var(--accent)",
                   margin: "0 0 10px",
                 }}
               >
@@ -542,7 +622,6 @@ function SkillsSection() {
             onChange={(v) => setForm((f) => ({ ...f, iconType: v }))}
             options={[
               { value: "predefined", label: "Icône prédéfinie" },
-              { value: "emoji", label: "Emoji" },
               { value: "url", label: "URL d'image" },
             ]}
           />
@@ -560,15 +639,6 @@ function SkillsSection() {
             />
           )}
 
-          {form.iconType === "emoji" && (
-            <Input
-              label="Emoji"
-              value={form.iconEmoji}
-              onChange={(v) => setForm((f) => ({ ...f, iconEmoji: v }))}
-              placeholder="🔥, 💻, 🚀..."
-            />
-          )}
-
           {form.iconType === "url" && (
             <Input
               label="URL de l'icône"
@@ -580,35 +650,21 @@ function SkillsSection() {
 
           {/* Aperçu de l'icône */}
           <div style={{ marginBottom: "1.1rem" }}>
-            <label
-              style={{
-                display: "block",
-                fontSize: "0.72rem",
-                fontWeight: 600,
-                color: "var(--color-text-muted)",
-                marginBottom: "6px",
-                letterSpacing: "0.04em",
-                textTransform: "uppercase",
-              }}
-            >
-              Aperçu
-            </label>
+            <label style={labelStyle}>Aperçu</label>
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
                 gap: "1rem",
                 padding: "1rem",
-                background: "var(--glass-bg)",
-                border: "1px solid var(--glass-border)",
-                borderRadius: "10px",
+                background: "var(--bg)",
+                border: "1px solid var(--border)",
+                borderRadius: "var(--r-md)",
               }}
             >
-              <div style={{ width: 44, height: 44, color: "var(--color-text)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <div style={{ width: 44, height: 44, color: "var(--text)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 {form.iconType === "predefined" && TECH_ICONS[form.iconKey] ? (
                   TECH_ICONS[form.iconKey]
-                ) : form.iconType === "emoji" && form.iconEmoji ? (
-                  <span style={{ fontSize: "2rem" }}>{form.iconEmoji}</span>
                 ) : form.iconType === "url" && form.iconUrl ? (
                   <img
                     src={form.iconUrl}
@@ -624,11 +680,9 @@ function SkillsSection() {
                   </svg>
                 )}
               </div>
-              <span style={{ fontSize: "0.85rem", color: "var(--color-text)" }}>
+              <span style={{ fontSize: "0.85rem", color: "var(--text)" }}>
                 {form.iconType === "predefined" && form.iconKey
                   ? form.iconKey
-                  : form.iconType === "emoji" && form.iconEmoji
-                  ? form.iconEmoji
                   : form.iconType === "url" && form.iconUrl
                   ? "URL personnalisée"
                   : "Aucune icône sélectionnée"}
@@ -705,33 +759,30 @@ function ParcoursSection() {
           justifyContent: "space-between",
           alignItems: "center",
           marginBottom: "1rem",
-          paddingBottom: "0.75rem",
-          borderBottom: "1px solid var(--glass-border)",
         }}
       >
         <span
           style={{
-            fontSize: "0.78rem",
-            fontFamily: "var(--font-mono)",
-            color: "var(--color-text-muted)",
+            fontFamily: "var(--mono)",
+            fontSize: "0.72rem",
+            fontWeight: 700,
+            color: "var(--accent)",
             textTransform: "uppercase",
-            letterSpacing: "0.08em",
+            letterSpacing: "0.1em",
           }}
         >
-          {type === "education" ? "🎓 Formation" : "💼 Expérience"}
+          {type === "education" ? "Formation" : "Expérience"}
         </span>
         <Btn onClick={() => openAdd(type)} variant="ghost" small>
           + Ajouter
         </Btn>
       </div>
       {loadingState ? (
-        <p style={{ color: "var(--color-text-muted)", fontSize: "0.85rem" }}>
+        <p style={{ color: "var(--text-2)", fontSize: "0.85rem" }}>
           Chargement...
         </p>
       ) : (
-        <div
-          style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}
-        >
+        <div style={listContainerStyle}>
           {items.map((item) => (
             <ListRow
               key={item.id}
@@ -748,12 +799,20 @@ function ParcoursSection() {
 
   return (
     <div>
-      <div style={{ marginBottom: "1.5rem" }}>
+      <div
+        style={{
+          marginBottom: "1.5rem",
+          paddingBottom: "1.1rem",
+          borderBottom: "1px solid var(--border)",
+        }}
+      >
         <h3
           style={{
-            fontSize: "1.1rem",
-            fontWeight: 700,
-            color: "var(--color-text)",
+            fontFamily: "var(--font-head)",
+            fontSize: "1.45rem",
+            fontWeight: 600,
+            letterSpacing: "-0.02em",
+            color: "var(--text)",
             margin: 0,
           }}
         >
@@ -761,9 +820,12 @@ function ParcoursSection() {
         </h3>
         <p
           style={{
-            fontSize: "0.78rem",
-            color: "var(--color-text-muted)",
-            margin: "2px 0 0",
+            fontFamily: "var(--mono)",
+            fontSize: "0.68rem",
+            color: "var(--text-2)",
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            margin: "4px 0 0",
           }}
         >
           Formation et expériences professionnelles
@@ -872,11 +934,9 @@ function CertificationsSection() {
         onAdd={openAdd}
       />
       {loading ? (
-        <p style={{ color: "var(--color-text-muted)" }}>Chargement...</p>
+        <p style={{ color: "var(--text-2)" }}>Chargement...</p>
       ) : (
-        <div
-          style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}
-        >
+        <div style={listContainerStyle}>
           {data.map((c) => (
             <ListRow
               key={c.id}
@@ -932,16 +992,32 @@ function CertificationsSection() {
    Dashboard principal
 ═══════════════════════════════════════ */
 const tabs = [
-  { key: "projects", label: "Projets", icon: "🚀" },
-  { key: "skills", label: "Compétences", icon: "⚡" },
-  { key: "parcours", label: "Parcours", icon: "🎓" },
-  { key: "certifications", label: "Certifications", icon: "🏆" },
+  { key: "projects", label: "Projets" },
+  { key: "skills", label: "Compétences" },
+  { key: "parcours", label: "Parcours" },
+  { key: "certifications", label: "Certifications" },
 ];
 
 export default function Dashboard() {
   const { currentUser, logout } = useAuth();
   const [activeTab, setActiveTab] = useState("projects");
   const [error, setError] = useState("");
+
+  const { firstName, photo, initials } = PORTFOLIO.personal;
+
+  const projects = useCollection("projects");
+  const skills = useCollection("skills");
+  const education = useCollection("education");
+  const experience = useCollection("experience");
+  const certifications = useCollection("certifications");
+
+  const stats = [
+    { key: "projects", icon: <RocketIcon width={20} height={20} />, num: projects.data.length, label: "Projets" },
+    { key: "skills", icon: <ZapIcon width={20} height={20} />, num: skills.data.length, label: "Compétences" },
+    { key: "parcours", icon: <GraduationIcon width={20} height={20} />, num: education.data.length, label: "Formations" },
+    { key: "parcours", icon: <BriefcaseIcon width={20} height={20} />, num: experience.data.length, label: "Expériences" },
+    { key: "certifications", icon: <AwardIcon width={20} height={20} />, num: certifications.data.length, label: "Certifications" },
+  ];
 
   async function handleLogout() {
     setError("");
@@ -956,8 +1032,8 @@ export default function Dashboard() {
     <div
       style={{
         minHeight: "100vh",
-        background: "var(--color-bg)",
-        color: "var(--color-text)",
+        background: "var(--bg)",
+        color: "var(--text)",
       }}
     >
       {/* ── Top Bar ── */}
@@ -970,9 +1046,10 @@ export default function Dashboard() {
           top: 0,
           zIndex: 100,
           padding: "0.75rem 2rem",
-          minHeight: "64px",
-          background: "var(--glass-bg)",
-          backdropFilter: "blur(20px)",
+          minHeight: "60px",
+          background: "var(--glass-bg-strong)",
+          backdropFilter: "blur(var(--glass-blur)) saturate(150%)",
+          WebkitBackdropFilter: "blur(var(--glass-blur)) saturate(150%)",
           borderBottom: "1px solid var(--glass-border)",
           display: "flex",
           justifyContent: "space-between",
@@ -985,27 +1062,26 @@ export default function Dashboard() {
           className="px-dash-header-left"
           style={{ display: "flex", alignItems: "center", gap: "16px" }}
         >
-          <motion.a
+          <a
             href="/"
-            whileHover={{
-              x: -3,
-              background: "var(--glass-bg-hover)",
-              borderColor: "var(--glass-border-hover)",
-            }}
             style={{
               display: "flex",
               alignItems: "center",
               gap: "8px",
-              fontSize: "0.9rem",
-              color: "var(--color-text)",
+              fontSize: "0.78rem",
+              fontFamily: "var(--mono)",
+              color: "var(--text-2)",
               textDecoration: "none",
-              fontWeight: 700,
-              padding: "8px 16px",
-              borderRadius: "10px",
-              background: "var(--glass-bg)",
-              backdropFilter: "blur(8px)",
-              border: "1px solid var(--glass-border)",
-              transition: "all 0.2s",
+              transition: "color var(--fast)",
+              borderBottom: "1px solid transparent",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "var(--accent)";
+              e.currentTarget.style.borderBottomColor = "var(--accent)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "var(--text-2)";
+              e.currentTarget.style.borderBottomColor = "transparent";
             }}
           >
             <svg
@@ -1013,23 +1089,24 @@ export default function Dashboard() {
               fill="none"
               stroke="currentColor"
               strokeWidth="2.5"
-              style={{ width: "14px", height: "14px" }}
+              style={{ width: "13px", height: "13px" }}
             >
               <path d="M19 12H5M12 5l-7 7 7 7" />
             </svg>
             Retour au site
-          </motion.a>
-          <span style={{ color: "var(--glass-border)", fontSize: "1.2rem" }}>
-            |
-          </span>
+          </a>
+          <span style={{ color: "var(--border)", fontSize: "1.1rem" }}>·</span>
           <span
             style={{
-              fontSize: "0.95rem",
+              fontFamily: "var(--mono)",
+              fontSize: "0.75rem",
               fontWeight: 700,
-              color: "var(--color-text)",
+              color: "var(--accent)",
+              textTransform: "uppercase",
+              letterSpacing: "0.1em",
             }}
           >
-            Administration
+            Studio privé
           </span>
         </div>
         <div
@@ -1043,12 +1120,16 @@ export default function Dashboard() {
         >
           <span
             className="px-dash-email"
-            style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}
+            style={{
+              fontFamily: "var(--mono)",
+              fontSize: "0.72rem",
+              color: "var(--text-2)",
+            }}
           >
             {currentUser?.email}
           </span>
           {error && (
-            <span style={{ color: "#f87171", fontSize: "0.75rem" }}>
+            <span style={{ color: "#e5484d", fontSize: "0.75rem" }}>
               {error}
             </span>
           )}
@@ -1062,12 +1143,12 @@ export default function Dashboard() {
       <div
         className="px-dash-layout"
         style={{
-          maxWidth: "1280px",
+          maxWidth: "1240px",
           margin: "0 auto",
-          padding: "3rem 2rem",
+          padding: "2.5rem 2rem",
           display: "grid",
-          gridTemplateColumns: "260px 1fr",
-          gap: "3rem",
+          gridTemplateColumns: "240px 1fr",
+          gap: "2.5rem",
           alignItems: "start",
         }}
       >
@@ -1077,9 +1158,9 @@ export default function Dashboard() {
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: "2rem",
+            gap: "1.75rem",
             position: "sticky",
-            top: "100px",
+            top: "96px",
           }}
         >
           <motion.div
@@ -1087,132 +1168,191 @@ export default function Dashboard() {
             animate={{ opacity: 1, x: 0 }}
             style={{
               background: "var(--glass-bg)",
-              backdropFilter: "blur(20px)",
-              borderRadius: "20px",
-              padding: "2rem",
+              backdropFilter: "blur(var(--glass-blur)) saturate(150%)",
+              WebkitBackdropFilter: "blur(var(--glass-blur)) saturate(150%)",
               border: "1px solid var(--glass-border)",
-              boxShadow: "var(--shadow-md)",
-              position: "relative",
-              overflow: "hidden",
+              borderRadius: "var(--r-xl)",
+              padding: "1.5rem 1.6rem",
+              display: "flex",
+              flexDirection: "column",
+              gap: "1rem",
             }}
           >
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                height: "4px",
-                background:
-                  "linear-gradient(90deg, var(--color-accent), var(--color-secondary, #a8b1ff))",
-              }}
-            />
+            <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+              <div
+                style={{
+                  width: "52px",
+                  height: "52px",
+                  borderRadius: "var(--r-full)",
+                  overflow: "hidden",
+                  border: "2px solid var(--accent)",
+                  flexShrink: 0,
+                }}
+              >
+                {photo ? (
+                  <img
+                    src={photo}
+                    alt={firstName}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: "var(--accent)",
+                      color: "#fff",
+                      fontFamily: "var(--font-head)",
+                      fontSize: "1.1rem",
+                    }}
+                  >
+                    {initials}
+                  </div>
+                )}
+              </div>
+              <div>
+                <p
+                  style={{
+                    fontFamily: "var(--mono)",
+                    fontSize: "0.68rem",
+                    fontWeight: 700,
+                    color: "var(--accent)",
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    margin: 0,
+                  }}
+                >
+                  · Studio privé ·
+                </p>
+                <h1
+                  style={{
+                    fontFamily: "var(--font-head)",
+                    fontSize: "1.35rem",
+                    fontWeight: 600,
+                    letterSpacing: "-0.02em",
+                    color: "var(--text)",
+                    margin: "4px 0 0",
+                  }}
+                >
+                  Bonjour, {firstName}
+                </h1>
+              </div>
+            </div>
             <p
               style={{
-                fontFamily: "var(--font-mono)",
                 fontSize: "0.82rem",
-                color: "var(--color-accent)",
-                marginBottom: "0.5rem",
-              }}
-            >
-              Bienvenue, {currentUser?.email?.split("@")[0]} 👋
-            </p>
-            <h1
-              style={{
-                fontSize: "1.6rem",
-                fontWeight: 800,
-                color: "var(--color-text)",
-                letterSpacing: "-0.04em",
-                margin: "0 0 0.5rem",
-              }}
-            >
-              Dashboard
-            </h1>
-            <p
-              style={{
-                fontSize: "0.85rem",
-                color: "var(--color-text-muted)",
+                color: "var(--text-2)",
                 margin: 0,
-                lineHeight: 1.5,
+                lineHeight: 1.6,
+                borderTop: "1px solid var(--border)",
+                paddingTop: "1rem",
               }}
             >
-              Gérez le contenu de votre portfolio en temps réel.
+              Gérez ici les projets, compétences, parcours et certifications
+              affichés sur votre portfolio.
             </p>
           </motion.div>
 
           {/* Onglets verticaux */}
           <motion.div
+            className="px-dash-tabs"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
             style={{ display: "flex", flexDirection: "column", gap: "6px" }}
           >
-            {tabs.map((tab) => (
-              <motion.button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                whileHover={{
-                  x: 4,
-                  background:
-                    activeTab === tab.key
-                      ? "var(--color-accent)"
-                      : "var(--glass-bg-hover)",
-                }}
-                whileTap={{ scale: 0.98 }}
-                style={{
-                  padding: "14px 20px",
-                  borderRadius: "14px",
-                  fontSize: "0.9rem",
-                  fontWeight: activeTab === tab.key ? 700 : 500,
-                  background:
-                    activeTab === tab.key
-                      ? "var(--color-accent)"
-                      : "transparent",
-                  color: activeTab === tab.key ? "#fff" : "var(--color-text)",
-                  border: "none",
-                  cursor: "pointer",
-                  transition: "all 0.2s",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                  boxShadow:
-                    activeTab === tab.key
-                      ? "0 4px 14px var(--color-accent-glow)"
-                      : "none",
-                }}
-              >
-                <span style={{ fontSize: "1.2rem" }}>{tab.icon}</span>{" "}
-                {tab.label}
-              </motion.button>
-            ))}
+            {tabs.map((tab, i) => {
+              const active = activeTab === tab.key;
+              return (
+                <motion.button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  whileHover={{ x: 3 }}
+                  whileTap={{ scale: 0.98 }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    padding: "10px 14px",
+                    borderRadius: "var(--r-md)",
+                    background: active ? "var(--accent-glow)" : "transparent",
+                    color: active ? "var(--accent)" : "var(--text-2)",
+                    border: active ? "1px solid var(--accent)" : "1px solid transparent",
+                    cursor: "pointer",
+                    fontFamily: "var(--mono)",
+                    fontSize: "0.74rem",
+                    fontWeight: 700,
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                    textAlign: "left",
+                    transition: "all var(--fast)",
+                  }}
+                >
+                  <span style={{ fontSize: "0.68rem", opacity: 0.65 }}>
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  {tab.label}
+                </motion.button>
+              );
+            })}
           </motion.div>
         </div>
 
-        {/* Contenu de l'onglet */}
-        <AnimatePresence mode="wait">
+        {/* Contenu principal */}
+        <div className="px-dash-main">
+          {/* Compteurs "studio" */}
           <motion.div
-            key={activeTab}
-            className="px-dash-tabpanel"
-            initial={{ opacity: 0, y: 15, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -15, scale: 0.98 }}
+            className="px-dash-stats"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            style={{
-              background: "var(--glass-bg)",
-              backdropFilter: "blur(24px)",
-              border: "1px solid var(--glass-border)",
-              borderRadius: "24px",
-              padding: "3rem",
-              boxShadow: "var(--shadow-lg)",
-              minHeight: "60vh",
-            }}
           >
-            {activeTab === "projects" && <ProjectsSection />}
-            {activeTab === "skills" && <SkillsSection />}
-            {activeTab === "parcours" && <ParcoursSection />}
-            {activeTab === "certifications" && <CertificationsSection />}
+            {stats.map((s) => (
+              <button
+                key={s.label}
+                className={`px-stat ${activeTab === s.key ? "active" : ""}`}
+                onClick={() => setActiveTab(s.key)}
+                title={`Voir les ${s.label.toLowerCase()}`}
+                style={{ cursor: "pointer", textAlign: "left" }}
+              >
+                <span className="px-stat-icon">{s.icon}</span>
+                <p className="px-stat-num">
+                  {s.num}<em>+</em>
+                </p>
+                <p className="px-stat-label">{s.label}</p>
+              </button>
+            ))}
           </motion.div>
-        </AnimatePresence>
+
+          {/* Contenu de l'onglet */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              className="px-dash-tabpanel"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
+              style={{
+                background: "var(--glass-bg-strong)",
+                backdropFilter: "blur(var(--glass-blur)) saturate(150%)",
+                WebkitBackdropFilter: "blur(var(--glass-blur)) saturate(150%)",
+                border: "1px solid var(--glass-border)",
+                borderRadius: "var(--r-xl)",
+                padding: "2.5rem",
+                minHeight: "60vh",
+              }}
+            >
+              {activeTab === "projects" && <ProjectsSection />}
+              {activeTab === "skills" && <SkillsSection />}
+              {activeTab === "parcours" && <ParcoursSection />}
+              {activeTab === "certifications" && <CertificationsSection />}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );
