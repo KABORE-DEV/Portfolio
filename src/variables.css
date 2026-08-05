@@ -75,10 +75,6 @@
   --glass-border:       rgba(255, 255, 255, 0.72);
   --glass-blur:         18px;
 
-  /* ── Halos d'arrière-plan (nourrissent le verre) ── */
-  --orb-1: rgba(255, 77, 36, 0.38);
-  --orb-2: rgba(255, 145, 105, 0.32);
-  --orb-3: rgba(255, 200, 140, 0.38);
   --radius-sm:          var(--r-sm);
   --radius-lg:          var(--r-lg);
   --shadow-lg:          var(--shadow-md);
@@ -125,11 +121,6 @@
   --glass-bg-strong:    rgba(30, 30, 27, 0.78);
   --glass-border:       rgba(255, 255, 255, 0.12);
   --glass-blur:         18px;
-
-  /* ── Halos d'arrière-plan (mode sombre) ── */
-  --orb-1: rgba(255, 112, 77, 0.20);
-  --orb-2: rgba(255, 140, 100, 0.15);
-  --orb-3: rgba(255, 170, 120, 0.18);
 }
 
 /* ── Base ──────────────────────────────── */

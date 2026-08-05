@@ -3,12 +3,6 @@ import { PORTFOLIO } from "../data.js";
 import { GraduationIcon, ArrowDownIcon } from "../icons.jsx";
 import { TECH_ICONS } from "../techIcons.jsx";
 
-const LEVEL_DOTS = {
-  practiced: 3,
-  familiar: 2,
-  learning: 1,
-};
-
 function TimelineItem({ item, type, isLast }) {
   const title = type === "education" ? item.degree : item.role;
   const sub   = type === "education" ? item.school : item.company;
@@ -25,23 +19,20 @@ function TimelineItem({ item, type, isLast }) {
 }
 
 /* ── Ticket outil (boîte à outils) ─────── */
-function ToolCard({ skill, index }) {
-  const dots = LEVEL_DOTS[skill.level] || 1;
-  const icon = TECH_ICONS[skill.name] || TECH_ICONS[skill.iconKey] || null;
+function ToolCard({ skill }) {
+  let icon = null;
+  if (skill.iconType === "url" && skill.iconUrl) {
+    icon = <img src={skill.iconUrl} alt={skill.name} loading="lazy" />;
+  } else {
+    icon = TECH_ICONS[skill.name] || TECH_ICONS[skill.iconKey] || null;
+  }
 
   return (
     <div className="tool-card" title={skill.context}>
-      <span className="tool-num">n°{String(index + 1).padStart(2, "0")}</span>
       <div className="tool-icon">{icon}</div>
-      <p className="tool-name">{skill.name}</p>
-      <p className="tool-level">{skill.context || "—"}</p>
-      <div className="tool-divider" aria-hidden="true">
-        <span className="tool-notch">✦</span>
-      </div>
-      <div className="tool-bars" aria-label={`Niveau ${dots}/3`}>
-        {[1, 2, 3].map(d => (
-          <span key={d} className={`tool-bar ${d <= dots ? "on" : ""}`} style={{ height: 10 + d * 4 }} />
-        ))}
+      <div className="tool-info">
+        <p className="tool-name">{skill.name}</p>
+        <p className="tool-level">{skill.context || "—"}</p>
       </div>
     </div>
   );
@@ -125,7 +116,7 @@ export default function ResumePage() {
               <>
                 <h4 className="tool-group-label">Front-end</h4>
                 <div className="tools-grid">
-                  {front.map((s, i) => <ToolCard key={s.name} skill={s} index={i} />)}
+                  {front.map(s => <ToolCard key={s.name} skill={s} />)}
                 </div>
               </>
             )}
@@ -133,7 +124,7 @@ export default function ResumePage() {
               <>
                 <h4 className="tool-group-label">Back-end</h4>
                 <div className="tools-grid">
-                  {back.map((s, i) => <ToolCard key={s.name} skill={s} index={i} />)}
+                  {back.map(s => <ToolCard key={s.name} skill={s} />)}
                 </div>
               </>
             )}
@@ -141,7 +132,7 @@ export default function ResumePage() {
               <>
                 <h4 className="tool-group-label">Outils</h4>
                 <div className="tools-grid">
-                  {tools.map((s, i) => <ToolCard key={s.name} skill={s} index={i} />)}
+                  {tools.map(s => <ToolCard key={s.name} skill={s} />)}
                 </div>
               </>
             )}

@@ -162,11 +162,6 @@ function AppShell() {
 
   return (
     <div className="app-root">
-      <div className="bg-orbs" aria-hidden="true">
-        <span className="bg-orb bg-orb-1" />
-        <span className="bg-orb bg-orb-2" />
-        <span className="bg-orb bg-orb-3" />
-      </div>
       <Navbar
         activePage={page}
         navigate={navigate}
