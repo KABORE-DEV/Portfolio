@@ -15,8 +15,8 @@ const SERVICES = [
 ];
 
 const MARQUEE = [
-  "Développement Web", "React", "Laravel", "UI / UX",
-  "Bases de données", "Git", "PHP", "Java", "Firebase", "MySQL",
+  "Développement Web", "React", "Laravel",
+  "Bases de données", "Git", "PHP", "Java", "MySQL",
 ];
 
 export default function HomePage({ onNavigate }) {
@@ -47,9 +47,9 @@ export default function HomePage({ onNavigate }) {
       <section className="hero">
         <div className="container hero-grid">
           <div>
-            <p className="hero-eyebrow">Portfolio · 2026 — Bobo-Dioulasso</p>
+            <p className="hero-eyebrow">Disponible</p>
             <h1 className="hero-title">
-              Bonjour, moi c'est <em>{firstName}</em>.
+              Salut, moi c'est <em>{firstName}</em>.
               <span className="hero-line2">Je crée des expériences web <em>chics &amp; malines.</em></span>
             </h1>
             <p className="hero-sub">
@@ -90,7 +90,7 @@ export default function HomePage({ onNavigate }) {
                 : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "4rem", fontFamily: "var(--font-head)", color: "var(--accent)" }}>{initials}</div>
               }
             </div>
-            <span className="hero-photo-badge">Disponible pour toute collaboration ✦</span>
+            <span className="hero-photo-badge">Disponible pour toute collaboration</span>
           </div>
         </div>
       </section>

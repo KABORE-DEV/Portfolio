@@ -135,7 +135,7 @@ export default function ContactPage() {
 
               {status === "ok" && (
                 <p className="form-status ok" style={{ marginTop: "1rem" }}>
-                  Message prêt à partir ! Votre client mail s'est ouvert. ✦
+                  Message prêt à partir ! Votre client mail s'est ouvert.
                 </p>
               )}
               {status === "err" && (
