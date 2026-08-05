@@ -1068,7 +1068,7 @@
   }
   .hero-photo {
     position: relative;
-    width: 165px;
+    width: 205px;
     aspect-ratio: 1;
     border-radius: 50%;
     flex-shrink: 0;
@@ -1085,7 +1085,7 @@
     animation: spin 16s linear infinite;
     pointer-events: none;
   }
-  .hero-photo img { object-position: top; }
+  .hero-photo img { object-position: center 25%; }
   .hero-photo-badge {
     position: static;
     transform: rotate(-3deg);
