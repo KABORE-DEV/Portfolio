@@ -8,15 +8,35 @@ export default function ContactPage() {
 
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
   const [status, setStatus] = useState(null); // null | "ok" | "err"
+  const [errors, setErrors] = useState({ name: "", email: "", subject: "", message: "" });
+
+  const handleChange = (key) => (e) => {
+    setForm(f => ({ ...f, [key]: e.target.value }));
+    setErrors(err => ({ ...err, [key]: "" }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const subject = encodeURIComponent(form.subject || `Message de ${form.name || "un visiteur"}`);
+
+    const errs = {};
+    if (!form.name.trim()) errs.name = "Veuillez indiquer votre nom.";
+    if (!/^\S+@\S+\.\S+$/.test(form.email.trim())) errs.email = "Adresse email invalide.";
+    if (!form.subject.trim()) errs.subject = "Veuillez indiquer un sujet.";
+    if (!form.message.trim()) errs.message = "Veuillez écrire votre message.";
+
+    if (Object.keys(errs).length) {
+      setErrors(errs);
+      setStatus("err");
+      return;
+    }
+
+    const subject = encodeURIComponent(form.subject);
     const body = encodeURIComponent(`${form.message}\n\n— ${form.name} (${form.email})`);
     const mailto = `mailto:${email}?subject=${subject}&body=${body}`;
     window.location.href = mailto;
-    setStatus("ok");
+    setErrors({ name: "", email: "", subject: "", message: "" });
     setForm({ name: "", email: "", subject: "", message: "" });
+    setStatus("ok");
     setTimeout(() => setStatus(null), 6000);
   };
 
@@ -83,24 +103,24 @@ export default function ContactPage() {
                   <label htmlFor="c-name">Nom</label>
                   <input
                     id="c-name"
-                    className="input"
+                    className={`input${errors.name ? " invalid" : ""}`}
                     value={form.name}
-                    onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                    onChange={handleChange("name")}
                     placeholder="Votre nom"
-                    required
                   />
+                  {errors.name && <p className="field-err">{errors.name}</p>}
                 </div>
                 <div className="field">
                   <label htmlFor="c-email">Email</label>
                   <input
                     id="c-email"
                     type="email"
-                    className="input"
+                    className={`input${errors.email ? " invalid" : ""}`}
                     value={form.email}
-                    onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                    onChange={handleChange("email")}
                     placeholder="vous@email.com"
-                    required
                   />
+                  {errors.email && <p className="field-err">{errors.email}</p>}
                 </div>
               </div>
 
@@ -108,25 +128,25 @@ export default function ContactPage() {
                 <label htmlFor="c-subject">Sujet</label>
                 <input
                   id="c-subject"
-                  className="input"
+                  className={`input${errors.subject ? " invalid" : ""}`}
                   value={form.subject}
-                  onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
+                  onChange={handleChange("subject")}
                   placeholder="De quoi voulez-vous parler ?"
-                  required
                 />
+                {errors.subject && <p className="field-err">{errors.subject}</p>}
               </div>
 
               <div className="field">
                 <label htmlFor="c-message">Message</label>
                 <textarea
                   id="c-message"
-                  className="textarea"
+                  className={`textarea${errors.message ? " invalid" : ""}`}
                   rows={5}
                   value={form.message}
-                  onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
+                  onChange={handleChange("message")}
                   placeholder="Décrivez votre projet ou votre demande…"
-                  required
                 />
+                {errors.message && <p className="field-err">{errors.message}</p>}
               </div>
 
               <button type="submit" className="btn btn-primary btn-block" style={{ marginTop: "0.5rem" }}>
@@ -140,7 +160,7 @@ export default function ContactPage() {
               )}
               {status === "err" && (
                 <p className="form-status err" style={{ marginTop: "1rem" }}>
-                  Une erreur s'est produite. Réessayez.
+                  Merci de remplir tous les champs.
                 </p>
               )}
             </form>
