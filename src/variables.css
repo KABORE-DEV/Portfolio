@@ -13,6 +13,10 @@
   --accent-glow:   rgba(255, 77, 36, 0.08);
   --accent-border: rgba(255, 77, 36, 0.28);
 
+  /* ── Vert (point "disponible") ────────── */
+  --green:        #2fb36f;
+  --green-border: rgba(47, 179, 111, 0.35);
+
   /* ── Surfaces : Crème & papier ────────── */
   --bg:        #f6f4ee;
   --surface:   #ffffff;
@@ -88,6 +92,9 @@
   --accent-light:  #ff967e;
   --accent-glow:   rgba(255, 112, 77, 0.12);
   --accent-border: rgba(255, 112, 77, 0.30);
+
+  --green:        #4bd490;
+  --green-border: rgba(75, 212, 144, 0.40);
 
   --bg:        #141412;
   --surface:   #1c1c19;

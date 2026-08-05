@@ -339,10 +339,10 @@
   content: "";
   width: 7px; height: 7px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--green);
   animation: pulse 2s var(--ease) infinite;
 }
-@keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 var(--accent-border); } 50% { box-shadow: 0 0 0 8px transparent; } }
+@keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 var(--green-border); } 50% { box-shadow: 0 0 0 8px transparent; } }
 
 .hero-title {
   font-size: clamp(2.3rem, 6vw, 4.4rem);
