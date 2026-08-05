@@ -6,9 +6,9 @@ export default function ContactPage() {
   const { email, phone, location } = PORTFOLIO.personal;
   const { github, linkedin, whatsapp } = PORTFOLIO.social;
 
-  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const [form, setForm] = useState({ prenom: "", name: "", email: "", subject: "", message: "" });
   const [status, setStatus] = useState(null); // null | "ok" | "err"
-  const [errors, setErrors] = useState({ name: "", email: "", subject: "", message: "" });
+  const [errors, setErrors] = useState({ prenom: "", name: "", email: "", subject: "", message: "" });
 
   const handleChange = (key) => (e) => {
     setForm(f => ({ ...f, [key]: e.target.value }));
@@ -32,11 +32,11 @@ export default function ContactPage() {
     }
 
     const subject = encodeURIComponent(form.subject);
-    const body = encodeURIComponent(`${form.message}\n\n— ${form.name} (${form.email})`);
+    const body = encodeURIComponent(`${form.message}\n\n— ${form.prenom} ${form.name} (${form.email})`);
     const mailto = `mailto:${email}?subject=${subject}&body=${body}`;
     window.location.href = mailto;
-    setErrors({ name: "", email: "", subject: "", message: "" });
-    setForm({ name: "", email: "", subject: "", message: "" });
+    setErrors({ prenom: "", name: "", email: "", subject: "", message: "" });
+    setForm({ prenom: "", name: "", email: "", subject: "", message: "" });
     setStatus("ok");
     setTimeout(() => setStatus(null), 6000);
   };
@@ -101,6 +101,17 @@ export default function ContactPage() {
             <form onSubmit={handleSubmit} noValidate>
               <div className="form-grid2">
                 <div className="field">
+                  <label htmlFor="c-prenom">Prénom</label>
+                  <input
+                    id="c-prenom"
+                    className={`input${errors.prenom ? " invalid" : ""}`}
+                    value={form.prenom}
+                    onChange={handleChange("prenom")}
+                    placeholder="Votre prénom"
+                  />
+                  {errors.prenom && <p className="field-err">{errors.prenom}</p>}
+                </div>
+                <div className="field">
                   <label htmlFor="c-name">Nom</label>
                   <input
                     id="c-name"
@@ -111,18 +122,19 @@ export default function ContactPage() {
                   />
                   {errors.name && <p className="field-err">{errors.name}</p>}
                 </div>
-                <div className="field">
-                  <label htmlFor="c-email">Email</label>
-                  <input
-                    id="c-email"
-                    type="email"
-                    className={`input${errors.email ? " invalid" : ""}`}
-                    value={form.email}
-                    onChange={handleChange("email")}
-                    placeholder="vous@email.com"
-                  />
-                  {errors.email && <p className="field-err">{errors.email}</p>}
-                </div>
+              </div>
+
+              <div className="field">
+                <label htmlFor="c-email">Email</label>
+                <input
+                  id="c-email"
+                  type="email"
+                  className={`input${errors.email ? " invalid" : ""}`}
+                  value={form.email}
+                  onChange={handleChange("email")}
+                  placeholder="vous@email.com"
+                />
+                {errors.email && <p className="field-err">{errors.email}</p>}
               </div>
 
               <div className="field">
