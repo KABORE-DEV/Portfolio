@@ -20,6 +20,7 @@ export default function ContactPage() {
 
     const errs = {};
     if (!form.name.trim()) errs.name = "Veuillez indiquer votre nom.";
+    if (!form.prenom.trim()) errs.prenom = "Veuillez indiquer votre prénom.";
     if (!/^\S+@\S+\.\S+$/.test(form.email.trim())) errs.email = "Adresse email invalide.";
     if (!form.subject.trim()) errs.subject = "Veuillez indiquer un sujet.";
     if (!form.message.trim()) errs.message = "Veuillez écrire votre message.";
