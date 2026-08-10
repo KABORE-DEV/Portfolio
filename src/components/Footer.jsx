@@ -18,9 +18,7 @@ export default function Footer() {
 
           {/* Crédit amusant */}
           <div className="footer-credit">
-            <p className="footer-credit-main">
-              Ce site a été <em>pensé, codé et déployé</em> par moi-même.
-            </p>
+
             <p className="footer-credit-sub">
               © {year} {firstName} {lastName} — fait maison, de la première ligne de code au dernier pixel,
               avec beaucoup de café et un peu de folie.
