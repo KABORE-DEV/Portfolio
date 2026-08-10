@@ -12,16 +12,15 @@ export default function Footer() {
         <div className="footer-grid">
           {/* Identité */}
           <div>
-            <p className="footer-name">{firstName} {lastName}</p>
+            <p className="footer-name">{firstName} <em>{lastName}</em></p>
             <p className="footer-tag">Étudiant en génie logiciel · créateur de trucs chics &amp; malins.</p>
           </div>
 
           {/* Crédit amusant */}
           <div className="footer-credit">
-
             <p className="footer-credit-sub">
-              © {year} {firstName} {lastName} — fait maison, de la première ligne de code au dernier pixel,
-              avec beaucoup de café et un peu de folie.
+              © {year} <strong>{firstName} {lastName}</strong> — fait maison, de la première ligne de code au dernier pixel,
+              avec du <span className="footer-pop-accent">café</span> et un peu de <span className="footer-pop-accent">folie</span>.
             </p>
           </div>
 
