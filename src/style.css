@@ -750,41 +750,49 @@
 
 .section-sm{ padding: clamp(2.5rem, 5vw, 4rem) 0; }
 
-.stats{
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+.status-box{
   border: 1px solid var(--glass-border);
   border-radius: var(--r-xl);
   background: var(--glass-bg);
   backdrop-filter: blur(var(--glass-blur)) saturate(150%);
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
-  overflow: hidden;
+  padding: clamp(1.5rem, 3vw, 2rem) clamp(1.5rem, 4vw, 2.5rem);
   box-shadow: var(--shadow-sm);
 }
 
-.stat{ padding: 2.25rem 1.75rem; }
-
-.stat + .stat{ border-left: 1px solid var(--glass-border); }
-
-.stat-value{
+.status-line{
   font-family: var(--font-head);
-  font-size: clamp(2.4rem, 5vw, 3.4rem);
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: -0.03em;
+  font-size: clamp(1.15rem, 2.4vw, 1.6rem);
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
   color: var(--text);
-  margin-bottom: 0.5rem;
 }
 
-.stat-value em{ font-style: italic; color: var(--accent); }
+.status-line strong{ color: var(--accent); font-weight: 500; }
 
-.stat-label{
+.tech-badges{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}
+
+.tech-badge{
   font-family: var(--mono);
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-size: 0.72rem;
+  font-weight: 600;
   color: var(--text-2);
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--glass-bg);
+  transition: color var(--fast), border-color var(--fast);
+}
+
+.tech-badge:hover{
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 /* ══════════════════════════════════════════
@@ -1351,34 +1359,58 @@
 }
 
 .modal-box{
+  display: flex;
+  flex-direction: column;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-xl);
   width: 100%;
   max-width: 680px;
   max-height: 85vh;
-  overflow-y: auto;
-  overscroll-behavior: contain;
+  overflow: hidden;
   position: relative;
+  box-shadow: var(--shadow-md);
+}
+
+.modal-head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+  flex-shrink: 0;
+}
+
+.modal-eyebrow{
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3);
 }
 
 .modal-close{
-  position: absolute;
-  top: 1rem; right: 1rem;
-  width: 36px; height: 36px;
+  width: 34px; height: 34px;
   border-radius: var(--r-full);
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text-2);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer;
-  z-index: 2;
   transition: all var(--fast);
 }
 
 .modal-close:hover{ color: var(--accent); border-color: var(--accent-border); }
 
-.modal-body{ padding: 2.5rem; }
+.modal-body{
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 2rem 2.5rem 2.5rem;
+}
 
 .modal-media{
   border-radius: var(--r-lg);
@@ -1577,7 +1609,6 @@
   .hero-grid { grid-template-columns: 1fr 280px; gap: 3rem; }
   .timeline-grid { grid-template-columns: 1fr; gap: 3rem; }
   .contact-grid { grid-template-columns: 1fr; gap: 3rem; }
-  .px-dash-twocol{ grid-template-columns: 1fr !important; gap: 1.75rem !important; }
   .px-dash-layout{ grid-template-columns: 1fr !important; padding: 1.5rem 1.25rem !important; gap: 1.5rem !important; }
   .px-dash-sidebar{ position: static !important; }
   .px-dash-tabs{ flex-direction: row !important; flex-wrap: wrap; }
@@ -1636,9 +1667,8 @@
   .hero-title{ font-size: clamp(2.2rem, 10vw, 3.2rem); }
   .section{ padding: 4rem 0; }
   .section-head{ margin-bottom: 2.5rem; }
-  /* Stats */
-  .stats{ grid-template-columns: 1fr; }
-  .stat + .stat{ border-left: none; border-top: 1px solid var(--border); }
+  /* Status box */
+  .status-line{ font-size: 1.05rem; }
   /* Marquee */
   .marquee-item{ gap: 1.5rem; padding-right: 1.5rem; font-size: 0.7rem; }
   /* Proj cards */
@@ -1665,8 +1695,8 @@
     max-height: 92vh;
     margin: 0;
   }
+  .modal-head{ border-radius: var(--r-xl) var(--r-xl) 0 0; }
   .modal-body{ padding: 1.5rem 1.25rem 2rem; }
-  .modal-close{ top: 0.85rem; right: 0.85rem; }
   /* Compétences : compact, sans barres de progression */
   .skill-bar-segments{ display: none; }
   .skills-bars{ grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.75rem; }

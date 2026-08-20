@@ -5,14 +5,6 @@ import { GithubIcon, LinkedinIcon, WhatsappIcon, ArrowUpRightIcon, ArrowDownIcon
 import ProjectModal from "../components/ProjectModal.jsx";
 import ProjectRow from "../components/ProjectRow.jsx";
 
-/* ── Services ──────────────────────────── */
-const SERVICES = [
-  { title: "Sites web",        desc: "Des sites rapides, clairs et adaptés à tous les écrans.",             tag: "React · Laravel"    },
-  { title: "Applications",     desc: "Des applications web & mobile simples et efficaces.",                 tag: "Mobile · PWA"       },
-  { title: "Bases de données", desc: "Des données fiables et des requêtes rapides.",                        tag: "MySQL · PostgreSQL" },
-  { title: "Déploiement",      desc: "Du code propre, versionné et mis en ligne.",                          tag: "GitHub · Vercel"    },
-];
-
 const DEFAULT_MARQUEE = [
   "Développement Web", "React", "Laravel",
   "Bases de données", "Git", "PHP", "Java", "MySQL",
@@ -28,18 +20,20 @@ const PROCESS = [
 export default function HomePage({ onNavigate }) {
   const [selected, setSelected] = useState(null);
   const { data: personal, loading: profileLoading } = useProfile();
-  const { firstName, lastName, title, bio, photo, initials, email } = personal || PORTFOLIO.personal;
+  const { firstName, lastName, title, bio, initials, email } = personal || PORTFOLIO.personal;
+  // Photo dispo immédiatement si en cache ; initiales seulement lors du tout premier chargement
+  const photo = profileLoading && !personal ? null : (personal || PORTFOLIO.personal).photo;
   const { github, linkedin, whatsapp } = PORTFOLIO.social;
   const { data: projects } = useCollection("projects");
   const { data: skills }   = useCollection("skills");
+  const { data: services } = useCollection("services");
+
+  const expertises = services?.length ? services : PORTFOLIO.services;
 
   const marqueeItems = (skills && skills.length ? skills : PORTFOLIO.skills)
     .map(s => s.name)
     .filter(Boolean);
   const marquee = marqueeItems.length ? marqueeItems : DEFAULT_MARQUEE;
-
-  const projectCount = projects?.length || PORTFOLIO.projects.length;
-  const skillCount   = skills?.length   || PORTFOLIO.skills.length;
 
   const featured = projects?.length
     ? (projects.filter(p => p.featured).length
@@ -99,7 +93,7 @@ export default function HomePage({ onNavigate }) {
             <div className="hero-photo">
               <div className="hero-photo-shift" aria-hidden="true" />
               <div className="hero-photo-img">
-                {photo && !profileLoading
+                {photo
                   ? <img src={photo} alt={`Photo de ${firstName} ${lastName}`} />
                   : <div className="hero-photo-initials">{initials}</div>
                 }
@@ -125,21 +119,17 @@ export default function HomePage({ onNavigate }) {
         </div>
       </div>
 
-      {/* ═══ STATS ═════════════════════════ */}
-      <section className="section-sm" aria-label="Statistiques">
+      {/* ═══ DISPONIBILITÉ & TECHNOS ════════ */}
+      <section className="section-sm" aria-label="Statut et technologies">
         <div className="container">
-          <div className="stats">
-            <div className="stat">
-              <p className="stat-value">{projectCount}</p>
-              <p className="stat-label">Projets réalisés</p>
-            </div>
-            <div className="stat">
-              <p className="stat-value">{skillCount}</p>
-              <p className="stat-label">Technologies</p>
-            </div>
-            <div className="stat">
-              <p className="stat-value">3<em> ans</em></p>
-              <p className="stat-label">Formation en Génie Logiciel</p>
+          <div className="status-box">
+            <p className="status-line">
+              Passionné de <strong>développement web</strong> · Des idées aux applications en ligne
+            </p>
+            <div className="tech-badges">
+              {(skills && skills.length ? skills : PORTFOLIO.skills).map((s) => (
+                <span className="tech-badge" key={s.name}>{s.name}</span>
+              ))}
             </div>
           </div>
         </div>
@@ -164,7 +154,7 @@ export default function HomePage({ onNavigate }) {
           </div>
 
           <div className="service-grid" role="list">
-            {SERVICES.map((s, i) => (
+            {expertises.map((s, i) => (
               <button key={s.title} className="service-card" role="listitem" onClick={() => onNavigate("portfolio")}>
                 <span className="service-num">{String(i + 1).padStart(2, "0")}</span>
                 <h3 className="service-title">{s.title}</h3>

@@ -5,7 +5,7 @@ import { collection, getDocs, addDoc, updateDoc } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContext";
 import { useCollection, useProfile } from "../hooks/useFirestore";
 import { TECH_ICONS } from "../techIcons.jsx";
-import { RocketIcon, ZapIcon, GraduationIcon, BriefcaseIcon, AwardIcon } from "../icons.jsx";
+import { RocketIcon, ZapIcon, GraduationIcon, BriefcaseIcon, AwardIcon, ServiceIcon } from "../icons.jsx";
 import { PORTFOLIO } from "../data.js";
 import { db } from "../firebase.js";
 import ImageUploader from "../components/ImageUploader.jsx";
@@ -931,8 +931,9 @@ function ParcoursSection({ confirmDelete }) {
         className="px-dash-twocol"
         style={{
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
+          gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))",
           gap: "2.5rem",
+          alignItems: "start",
         }}
       >
         {renderCol(edu.data, "education", edu.loading)}
@@ -1078,6 +1079,81 @@ function CertificationsSection({ confirmDelete }) {
             label="Photo / capture du certificat"
             value={form.image}
             onChange={(url) => setForm((f) => ({ ...f, image: url }))}
+          />
+          <div style={{ marginTop: "0.5rem" }}>
+            <Btn onClick={handleSave} variant="primary">
+              {modal.mode === "add" ? "Ajouter" : "Enregistrer"}
+            </Btn>
+          </div>
+        </Modal>
+      )}
+    </div>
+  );
+}
+
+function ServicesSection({ confirmDelete }) {
+  const { data, loading, add, update, remove } = useCollection("services");
+  const [modal, setModal] = useState(null);
+  const emptyForm = { title: "", desc: "", tag: "" };
+  const [form, setForm] = useState(emptyForm);
+  const openAdd = () => {
+    setForm(emptyForm);
+    setModal({ mode: "add" });
+  };
+  const openEdit = (item) => {
+    setForm({
+      title: item.title || "",
+      desc: item.desc || "",
+      tag: item.tag || "",
+    });
+    setModal({ mode: "edit", item });
+  };
+  const handleSave = async () => {
+    if (modal.mode === "add") await add(form);
+    else await update(modal.item.id, form);
+    setModal(null);
+  };
+  return (
+    <div>
+      <SectionHeader title="Expertises" count={data.length} onAdd={openAdd} />
+      {loading ? (
+        <p style={{ color: "var(--text-2)" }}>Chargement...</p>
+      ) : (
+        <div style={listContainerStyle}>
+          {data.map((s) => (
+            <ListRow
+              key={s.id}
+              main={s.title}
+              sub={s.tag ? `${s.tag} — ${s.desc}` : s.desc}
+              onEdit={() => openEdit(s)}
+              onDelete={() => confirmDelete(`Voulez-vous vraiment supprimer l'expertise « ${s.title} » ?`, () => remove(s.id))}
+            />
+          ))}
+        </div>
+      )}
+      {modal && (
+        <Modal
+          title={modal.mode === "add" ? "Nouvelle expertise" : "Modifier l'expertise"}
+          onClose={() => setModal(null)}
+        >
+          <Input
+            label="Titre"
+            value={form.title}
+            onChange={(v) => setForm((f) => ({ ...f, title: v }))}
+            placeholder="Sites web, Applications..."
+          />
+          <TextArea
+            label="Description"
+            value={form.desc}
+            onChange={(v) => setForm((f) => ({ ...f, desc: v }))}
+            rows={3}
+            placeholder="Une phrase décrivant cette expertise..."
+          />
+          <Input
+            label="Tags (technologies)"
+            value={form.tag}
+            onChange={(v) => setForm((f) => ({ ...f, tag: v }))}
+            placeholder="React · Laravel"
           />
           <div style={{ marginTop: "0.5rem" }}>
             <Btn onClick={handleSave} variant="primary">
@@ -1244,6 +1320,7 @@ const tabs = [
   { key: "profile", label: "Profil" },
   { key: "projects", label: "Projets" },
   { key: "skills", label: "Compétences" },
+  { key: "services", label: "Expertises" },
   { key: "parcours", label: "Parcours" },
   { key: "certifications", label: "Certifications" },
 ];
@@ -1266,6 +1343,7 @@ export default function Dashboard({ onBack }) {
 
   const projects = useCollection("projects");
   const skills = useCollection("skills");
+  const services = useCollection("services");
   const education = useCollection("education");
   const experience = useCollection("experience");
   const certifications = useCollection("certifications");
@@ -1280,6 +1358,7 @@ export default function Dashboard({ onBack }) {
       const targets = [
         { name: "projects",       items: PORTFOLIO.projects || [],       key: "title"  },
         { name: "skills",         items: PORTFOLIO.skills || [],         key: "name"   },
+        { name: "services",       items: PORTFOLIO.services || [],       key: "title"  },
         { name: "education",      items: PORTFOLIO.education || [],      key: "degree" },
         { name: "experience",     items: PORTFOLIO.experience || [],     key: "role"   },
         { name: "certifications", items: PORTFOLIO.certifications || [], key: "title"  },
@@ -1319,6 +1398,7 @@ export default function Dashboard({ onBack }) {
         setSeedStatus(`✔ ${imported} mise(s) à jour effectuée(s) : ${parts.join(" ; ")}.`);
         projects.refresh();
         skills.refresh();
+        services.refresh();
         education.refresh();
         experience.refresh();
         certifications.refresh();
@@ -1335,6 +1415,7 @@ export default function Dashboard({ onBack }) {
   const stats = [
     { key: "projects", icon: <RocketIcon width={20} height={20} />, num: projects.data.length, label: "Projets" },
     { key: "skills", icon: <ZapIcon width={20} height={20} />, num: skills.data.length, label: "Compétences" },
+    { key: "services", icon: <ServiceIcon width={20} height={20} />, num: services.data.length, label: "Expertises" },
     { key: "parcours", icon: <GraduationIcon width={20} height={20} />, num: education.data.length, label: "Formations" },
     { key: "parcours", icon: <BriefcaseIcon width={20} height={20} />, num: experience.data.length, label: "Expériences" },
     { key: "certifications", icon: <AwardIcon width={20} height={20} />, num: certifications.data.length, label: "Certifications" },
@@ -1696,6 +1777,7 @@ export default function Dashboard({ onBack }) {
               {activeTab === "profile" && <ProfileSection />}
               {activeTab === "projects" && <ProjectsSection confirmDelete={confirmDelete} />}
               {activeTab === "skills" && <SkillsSection confirmDelete={confirmDelete} />}
+              {activeTab === "services" && <ServicesSection confirmDelete={confirmDelete} />}
               {activeTab === "parcours" && <ParcoursSection confirmDelete={confirmDelete} />}
               {activeTab === "certifications" && <CertificationsSection confirmDelete={confirmDelete} />}
             </motion.div>

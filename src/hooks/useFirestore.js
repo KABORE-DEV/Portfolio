@@ -3,6 +3,16 @@ import { db } from "../firebase";
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, setDoc } from "firebase/firestore";
 import { PORTFOLIO } from "../data.js";
 
+const PROFILE_CACHE_KEY = "portfolio-profile-cache";
+
+function cacheProfile(value) {
+  try {
+    localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(value));
+  } catch (e) {
+    console.warn("Impossible de mettre le profil en cache local:", e);
+  }
+}
+
 /** Hook générique pour une collection Firestore avec fallback sur data.js */
 export function useCollection(collectionName) {
   const fallback = PORTFOLIO[collectionName] || [];
@@ -65,7 +75,15 @@ export function useCollection(collectionName) {
 /** Hook pour un document unique "profile" (single doc) avec fallback sur data.js */
 export function useProfile() {
   const fallback = PORTFOLIO.personal || {};
-  const [data, setData] = useState(fallback);
+  // Photo/texte affichés immédiatement depuis le cache local si présent
+  const [data, setData] = useState(() => {
+    try {
+      const raw = localStorage.getItem(PROFILE_CACHE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  });
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async () => {
@@ -73,14 +91,13 @@ export function useProfile() {
     try {
       const ref = doc(db, "profile", "main");
       const snap = await getDoc(ref);
-      if (snap.exists()) {
-        setData({ ...fallback, ...snap.data() });
-      } else {
-        setData(fallback);
-      }
+      const next = snap.exists() ? { ...fallback, ...snap.data() } : fallback;
+      setData(next);
+      cacheProfile(next);
     } catch (e) {
       console.warn(`Firestore [profile] indisponible/vide, utilisation des données locales :`, e);
       setData(fallback);
+      cacheProfile(fallback);
     } finally {
       setLoading(false);
     }
@@ -93,7 +110,9 @@ export function useProfile() {
   const update = async (item) => {
     try {
       await setDoc(doc(db, "profile", "main"), item, { merge: true });
-      setData({ ...data, ...item });
+      const next = { ...data, ...item };
+      setData(next);
+      cacheProfile(next);
       return true;
     } catch (e) {
       console.error("Erreur de mise à jour du profil Firestore:", e);

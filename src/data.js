@@ -253,6 +253,29 @@ export const PORTFOLIO = {
     },
   ],
 
+  services: [
+    {
+      title: "Sites web",
+      desc: "Des sites rapides, clairs et adaptés à tous les écrans.",
+      tag: "React · Laravel",
+    },
+    {
+      title: "Applications",
+      desc: "Des applications web & mobile simples et efficaces.",
+      tag: "Mobile · PWA",
+    },
+    {
+      title: "Bases de données",
+      desc: "Des données fiables et des requêtes rapides.",
+      tag: "MySQL · PostgreSQL",
+    },
+    {
+      title: "Déploiement",
+      desc: "Du code propre, versionné et mis en ligne.",
+      tag: "GitHub · Vercel",
+    },
+  ],
+
   certifications: [
     {
       title: "Programmation avec JavaScript",
