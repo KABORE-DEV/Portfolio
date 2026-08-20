@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import "./ScrollToTop.css";
+import { scrollToTop } from "../lib/scroll.js";
 
 export default function ScrollToTop() {
   const [visible, setVisible] = useState(false);
@@ -17,17 +18,10 @@ export default function ScrollToTop() {
     return () => window.removeEventListener("scroll", toggleVisible);
   }, []);
 
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
-
   return (
     <button
       className={`scroll-to-top ${visible ? "is-visible" : ""}`}
-      onClick={scrollToTop}
+      onClick={() => scrollToTop(false)}
       aria-label="Retour en haut"
     >
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

@@ -1,22 +1,56 @@
 <!doctype html>
 <html lang="fr">
   <head>
-    <script>!function(){var t=localStorage.getItem("portfolio-theme")||"dark";document.documentElement.setAttribute("data-theme",t)}()</script>
+    <!-- Thème immédiat (évite flash) -->
+    <script>
+      !(function () {
+        var t = localStorage.getItem("portfolio-theme") || "light";
+        document.documentElement.setAttribute("data-theme", t);
+      })();
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#141412" media="(prefers-color-scheme: dark)" />
-    <meta name="theme-color" content="#f6f4ee" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#090C12" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#F6F3EA" media="(prefers-color-scheme: light)" />
+
+    <!-- SEO -->
+    <title>Frank KABORE — Développeur Web &amp; Mobile</title>
     <meta
       name="description"
-      content="Portfolio de Frank KABORE — étudiant en génie logiciel qui transforme les idées en expériences web chics & malines."
+      content="Portfolio de Frank KABORE — Développeur de sites et d'applications web & mobiles. Étudiant en Génie Logiciel · Burkina Faso · Bobo-Dioulasso."
     />
-    <!-- Google Fonts : Fraunces (titres serif chic) + Space Grotesk (corps) + Space Mono (labels) -->
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="Frank KABORE" />
+
+    <!-- Open Graph -->
+    <meta property="og:site_name" content="Frank KABORE" />
+    <meta property="og:title" content="Frank KABORE — Développeur Web &amp; Mobile" />
+    <meta
+      property="og:description"
+      content="Portfolio de Frank KABORE — développeur de sites et d'applications web & mobiles."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Frank KABORE — Développeur Web &amp; Mobile" />
+    <meta
+      name="twitter:description"
+      content="Portfolio de Frank KABORE — développeur de sites et d'applications web & mobiles."
+    />
+
+    <!-- Favicon — FK initiales -->
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23EB5929'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='Inter,sans-serif' font-weight='900' font-size='14' fill='%23FFFFFF'%3EFK%3C/text%3E%3C/svg%3E"
+    />
+
+    <!-- Google Fonts : Space Grotesk + Inter + JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Space+Grotesk:wght@300..700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
-      rel="stylesheet" />
-    <title>Frank KABORE · Créateur web chic &amp; malin</title>
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <div id="root"></div>

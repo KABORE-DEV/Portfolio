@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { collection, getDocs, addDoc, updateDoc } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContext";
-import { useCollection } from "../hooks/useFirestore";
+import { useCollection, useProfile } from "../hooks/useFirestore";
 import { TECH_ICONS } from "../techIcons.jsx";
 import { RocketIcon, ZapIcon, GraduationIcon, BriefcaseIcon, AwardIcon } from "../icons.jsx";
 import { PORTFOLIO } from "../data.js";
+import { db } from "../firebase.js";
+import ImageUploader from "../components/ImageUploader.jsx";
+import { stopLenis, startLenis } from "../lib/scroll.js";
 
 /* ═══════════════════════════════════════
    Composants UI réutilisables — Design System minimaliste
@@ -159,11 +163,16 @@ function Modal({ title, onClose, children }) {
   useEffect(() => {
     const onKey = (e) => e.key === "Escape" && onClose();
     document.addEventListener("keydown", onKey);
-    const prev = document.body.style.overflow;
+    const prevBody = document.body.style.overflow;
+    const prevHtml = document.documentElement.style.overflow;
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+    stopLenis();
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
+      document.body.style.overflow = prevBody;
+      document.documentElement.style.overflow = prevHtml;
+      startLenis();
     };
   }, [onClose]);
 
@@ -171,6 +180,7 @@ function Modal({ title, onClose, children }) {
     <AnimatePresence>
       <motion.div
         className="px-modal-overlay"
+        data-lenis-prevent
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -179,9 +189,10 @@ function Modal({ title, onClose, children }) {
           inset: 0,
           zIndex: 9999,
           display: "flex",
-          alignItems: "center",
+          alignItems: "flex-start",
           justifyContent: "center",
-          padding: "1rem",
+          overflowY: "auto",
+          padding: "1.5rem 1rem",
         }}
       >
         <div
@@ -195,6 +206,7 @@ function Modal({ title, onClose, children }) {
         />
         <motion.div
           className="px-modal-panel"
+          data-lenis-prevent
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 24 }}
@@ -205,6 +217,8 @@ function Modal({ title, onClose, children }) {
             maxWidth: "520px",
             maxHeight: "88vh",
             overflowY: "auto",
+            overscrollBehavior: "contain",
+            margin: "auto",
             background: "var(--surface)",
             border: "1px solid var(--border)",
             borderRadius: "var(--r-xl)",
@@ -271,6 +285,43 @@ function Modal({ title, onClose, children }) {
 }
 
 /* ═══════════════════════════════════════
+   Confirmation de suppression
+═══════════════════════════════════════ */
+
+function ConfirmDialog({ message, onCancel, onConfirm }) {
+  return (
+    <Modal title="Confirmer la suppression" onClose={onCancel}>
+      <p
+        style={{
+          color: "var(--text-2)",
+          fontSize: "0.9rem",
+          lineHeight: 1.6,
+          margin: "0 0 1.5rem",
+        }}
+      >
+        {message}
+      </p>
+      <p
+        style={{
+          fontFamily: "var(--mono)",
+          fontSize: "0.7rem",
+          color: "var(--text-3)",
+          textTransform: "uppercase",
+          letterSpacing: "0.06em",
+          margin: "0 0 1.5rem",
+        }}
+      >
+        Cette action est définitive.
+      </p>
+      <div style={{ display: "flex", gap: "0.75rem", justifyContent: "flex-end" }}>
+        <Btn onClick={onCancel} variant="ghost">Annuler</Btn>
+        <Btn onClick={onConfirm} variant="danger">Supprimer</Btn>
+      </div>
+    </Modal>
+  );
+}
+
+/* ═══════════════════════════════════════
    Sections
 ═══════════════════════════════════════ */
 
@@ -321,7 +372,7 @@ function SectionHeader({ title, count, onAdd }) {
   );
 }
 
-function ListRow({ main, sub, onEdit, onDelete }) {
+function ListRow({ main, sub, onEdit, onDelete, thumb }) {
   return (
     <motion.div
       whileHover={{ background: "var(--surface-2)" }}
@@ -335,36 +386,53 @@ function ListRow({ main, sub, onEdit, onDelete }) {
         borderBottom: "1px solid var(--border)",
       }}
     >
-      <div style={{ minWidth: 0, flex: "1 1 160px" }}>
-        <p
-          style={{
-            fontWeight: 600,
-            color: "var(--text)",
-            fontSize: "0.92rem",
-            margin: 0,
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {main}
-        </p>
-        {sub && (
+      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", minWidth: 0, flex: "1 1 160px" }}>
+        {thumb && (
+          <img
+            src={thumb}
+            alt=""
+            style={{
+              width: "56px",
+              height: "38px",
+              objectFit: "cover",
+              borderRadius: "6px",
+              border: "1px solid var(--border)",
+              background: "var(--surface-2)",
+              flexShrink: 0,
+            }}
+          />
+        )}
+        <div style={{ minWidth: 0 }}>
           <p
             style={{
-              fontFamily: "var(--mono)",
-              fontSize: "0.72rem",
-              color: "var(--text-2)",
-              marginTop: "3px",
+              fontWeight: 600,
+              color: "var(--text)",
+              fontSize: "0.92rem",
               margin: 0,
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
             }}
           >
-            {sub}
+            {main}
           </p>
-        )}
+          {sub && (
+            <p
+              style={{
+                fontFamily: "var(--mono)",
+                fontSize: "0.72rem",
+                color: "var(--text-2)",
+                marginTop: "3px",
+                margin: 0,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {sub}
+            </p>
+          )}
+        </div>
       </div>
       <div style={{ display: "flex", gap: "0.5rem", marginLeft: "auto", flexShrink: 0 }}>
         <Btn onClick={onEdit} variant="accent" small>Modifier</Btn>
@@ -380,17 +448,19 @@ const listContainerStyle = {
   borderTop: "1px solid var(--border)",
 };
 
-function ProjectsSection() {
+function ProjectsSection({ confirmDelete }) {
   const { data, loading, add, update, remove } = useCollection("projects");
   const [modal, setModal] = useState(null);
   const emptyForm = {
     title: "",
     description: "",
     longDescription: "",
+    features: "",
     technologies: "",
     github: "",
     demo: "",
     status: "",
+    image: "",
   };
   const [form, setForm] = useState(emptyForm);
   const openAdd = () => {
@@ -400,6 +470,9 @@ function ProjectsSection() {
   const openEdit = (item) => {
     setForm({
       ...item,
+      features: Array.isArray(item.features)
+        ? item.features.join(", ")
+        : item.features,
       technologies: Array.isArray(item.technologies)
         ? item.technologies.join(", ")
         : item.technologies,
@@ -409,6 +482,10 @@ function ProjectsSection() {
   const handleSave = async () => {
     const payload = {
       ...form,
+      features: form.features
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean),
       technologies: form.technologies
         .split(",")
         .map((t) => t.trim())
@@ -429,13 +506,14 @@ function ProjectsSection() {
             <ListRow
               key={p.id}
               main={p.title}
+              thumb={p.image}
               sub={
                 Array.isArray(p.technologies)
                   ? p.technologies.join(" · ")
                   : p.technologies
               }
               onEdit={() => openEdit(p)}
-              onDelete={() => remove(p.id)}
+              onDelete={() => confirmDelete(`Voulez-vous vraiment supprimer le projet « ${p.title} » ?`, () => remove(p.id))}
             />
           ))}
         </div>
@@ -464,6 +542,13 @@ function ProjectsSection() {
             rows={4}
             placeholder="Description détaillée..."
           />
+          <TextArea
+            label="Fonctionnalités (une par ligne ou séparées par des virgules)"
+            value={form.features}
+            onChange={(v) => setForm((f) => ({ ...f, features: v }))}
+            rows={3}
+            placeholder="Page d'accueil dynamique, Panier & commandes..."
+          />
           <Input
             label="Technologies (séparées par des virgules)"
             value={form.technologies}
@@ -488,6 +573,11 @@ function ProjectsSection() {
             onChange={(v) => setForm((f) => ({ ...f, status: v }))}
             placeholder="En cours, Terminé..."
           />
+          <ImageUploader
+            label="Capture d'écran du projet"
+            value={form.image}
+            onChange={(url) => setForm((f) => ({ ...f, image: url }))}
+          />
           <div style={{ marginTop: "0.5rem" }}>
             <Btn onClick={handleSave} variant="primary">
               {modal.mode === "add" ? "Ajouter le projet" : "Enregistrer"}
@@ -499,7 +589,7 @@ function ProjectsSection() {
   );
 }
 
-function SkillsSection() {
+function SkillsSection({ confirmDelete }) {
   const { data, loading, add, update, remove } = useCollection("skills");
   const [modal, setModal] = useState(null);
   const emptyForm = {
@@ -587,13 +677,13 @@ function SkillsSection() {
                   margin: "0 0 10px",
                 }}
               >
-                {s.category}
+                {({ front: "Front-end", back: "Back-end", framework: "Frameworks", tools: "Outils" })[s.category] || s.category}
               </p>
               <div style={{ display: "flex", gap: "6px" }}>
                 <Btn onClick={() => openEdit(s)} variant="accent" small>
                   Modifier
                 </Btn>
-                <Btn onClick={() => remove(s.id)} variant="danger" small>
+                <Btn onClick={() => confirmDelete(`Voulez-vous vraiment supprimer la compétence « ${s.name} » ?`, () => remove(s.id))} variant="danger" small>
                   Supprimer
                 </Btn>
               </div>
@@ -707,6 +797,7 @@ function SkillsSection() {
             options={[
               { value: "front", label: "Front-end" },
               { value: "back", label: "Back-end" },
+              { value: "framework", label: "Frameworks" },
               { value: "tools", label: "Outils" },
             ]}
           />
@@ -727,7 +818,7 @@ function SkillsSection() {
   );
 }
 
-function ParcoursSection() {
+function ParcoursSection({ confirmDelete }) {
   const edu = useCollection("education");
   const exp = useCollection("experience");
   const [modal, setModal] = useState(null);
@@ -789,7 +880,12 @@ function ParcoursSection() {
               main={type === "education" ? item.degree : item.role}
               sub={`${type === "education" ? item.school : item.company} · ${item.period}`}
               onEdit={() => openEdit(type, item)}
-              onDelete={() => handleRemove(type, item.id)}
+              onDelete={() => confirmDelete(
+                type === "education"
+                  ? `Voulez-vous vraiment supprimer la formation « ${item.degree} » ?`
+                  : `Voulez-vous vraiment supprimer l'expérience « ${item.role} » ?`,
+                () => handleRemove(type, item.id)
+              )}
             />
           ))}
         </div>
@@ -907,11 +1003,11 @@ function ParcoursSection() {
   );
 }
 
-function CertificationsSection() {
+function CertificationsSection({ confirmDelete }) {
   const { data, loading, add, update, remove } =
     useCollection("certifications");
   const [modal, setModal] = useState(null);
-  const emptyForm = { title: "", issuer: "", date: "", url: "" };
+  const emptyForm = { title: "", issuer: "", date: "", url: "", image: "" };
   const [form, setForm] = useState(emptyForm);
   const openAdd = () => {
     setForm(emptyForm);
@@ -941,9 +1037,10 @@ function CertificationsSection() {
             <ListRow
               key={c.id}
               main={c.title}
+              thumb={c.image}
               sub={`${c.issuer} · ${c.date}`}
               onEdit={() => openEdit(c)}
-              onDelete={() => remove(c.id)}
+              onDelete={() => confirmDelete(`Voulez-vous vraiment supprimer la certification « ${c.title} » ?`, () => remove(c.id))}
             />
           ))}
         </div>
@@ -977,6 +1074,11 @@ function CertificationsSection() {
             onChange={(v) => setForm((f) => ({ ...f, url: v }))}
             placeholder="https://..."
           />
+          <ImageUploader
+            label="Photo / capture du certificat"
+            value={form.image}
+            onChange={(url) => setForm((f) => ({ ...f, image: url }))}
+          />
           <div style={{ marginTop: "0.5rem" }}>
             <Btn onClick={handleSave} variant="primary">
               {modal.mode === "add" ? "Ajouter" : "Enregistrer"}
@@ -989,9 +1091,157 @@ function CertificationsSection() {
 }
 
 /* ═══════════════════════════════════════
+   Section Profil — photo & informations
+═══════════════════════════════════════ */
+function ProfileSection() {
+  const { data, loading, update } = useProfile();
+  const [form, setForm] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    if (!loading && data && form === null) setForm(data);
+  }, [loading, data, form]);
+
+  const set = (key) => (v) => setForm((f) => ({ ...f, [key]: v }));
+
+  const handleSave = async () => {
+    if (!form) return;
+    setSaving(true);
+    setSaved(false);
+    const ok = await update(form);
+    setSaving(false);
+    if (ok) {
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    }
+  };
+
+  return (
+    <div>
+      <div
+        style={{
+          marginBottom: "1.5rem",
+          paddingBottom: "1.1rem",
+          borderBottom: "1px solid var(--border)",
+        }}
+      >
+        <h3
+          style={{
+            fontFamily: "var(--font-head)",
+            fontSize: "1.45rem",
+            fontWeight: 600,
+            letterSpacing: "-0.02em",
+            color: "var(--text)",
+            margin: 0,
+          }}
+        >
+          Profil
+        </h3>
+        <p
+          style={{
+            fontFamily: "var(--mono)",
+            fontSize: "0.68rem",
+            color: "var(--text-2)",
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            margin: "4px 0 0",
+          }}
+        >
+          Photo et informations personnelles
+        </p>
+      </div>
+
+      {loading || !form ? (
+        <p style={{ color: "var(--text-2)" }}>Chargement...</p>
+      ) : (
+        <div>
+          <ImageUploader
+            label="Photo de profil"
+            value={form.photo}
+            onChange={set("photo")}
+            square
+          />
+
+          <Input
+            label="Prénom"
+            value={form.firstName}
+            onChange={set("firstName")}
+            placeholder="Frank"
+          />
+          <Input
+            label="Nom"
+            value={form.lastName}
+            onChange={set("lastName")}
+            placeholder="KABORE"
+          />
+          <Input
+            label="Titre / Statut"
+            value={form.title}
+            onChange={set("title")}
+            placeholder="Étudiant en Génie Logiciel"
+          />
+          <Input
+            label="Email"
+            type="email"
+            value={form.email}
+            onChange={set("email")}
+            placeholder="vous@exemple.com"
+          />
+          <Input
+            label="Téléphone"
+            value={form.phone}
+            onChange={set("phone")}
+            placeholder="+226 ..."
+          />
+          <Input
+            label="Localisation"
+            value={form.location}
+            onChange={set("location")}
+            placeholder="Burkina Faso · Bobo-Dioulasso"
+          />
+          <TextArea
+            label="Bio / description"
+            value={form.bio}
+            onChange={set("bio")}
+            placeholder="Présentation en quelques lignes..."
+            rows={4}
+          />
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "1rem",
+              marginTop: "0.5rem",
+            }}
+          >
+            <Btn onClick={handleSave} variant="primary">
+              {saving ? "Enregistrement..." : "Enregistrer"}
+            </Btn>
+            {saved && (
+              <span
+                style={{
+                  fontFamily: "var(--mono)",
+                  fontSize: "0.74rem",
+                  color: "var(--accent)",
+                }}
+              >
+                ✔ Enregistré
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════
    Dashboard principal
 ═══════════════════════════════════════ */
 const tabs = [
+  { key: "profile", label: "Profil" },
   { key: "projects", label: "Projets" },
   { key: "skills", label: "Compétences" },
   { key: "parcours", label: "Parcours" },
@@ -1002,14 +1252,85 @@ export default function Dashboard() {
   const { currentUser, logout } = useAuth();
   const [activeTab, setActiveTab] = useState("projects");
   const [error, setError] = useState("");
+  const [pendingDelete, setPendingDelete] = useState(null);
 
-  const { firstName, photo, initials } = PORTFOLIO.personal;
+  const confirmDelete = (message, action) => setPendingDelete({ message, action });
+  const handleConfirmDelete = async () => {
+    if (!pendingDelete) return;
+    await pendingDelete.action();
+    setPendingDelete(null);
+  };
+
+  const { data: profileData, loading: profileLoading } = useProfile();
+  const { firstName, photo, initials } = profileData || PORTFOLIO.personal;
 
   const projects = useCollection("projects");
   const skills = useCollection("skills");
   const education = useCollection("education");
   const experience = useCollection("experience");
   const certifications = useCollection("certifications");
+
+  const [seedLoading, setSeedLoading] = useState(false);
+  const [seedStatus, setSeedStatus] = useState("");
+
+  async function handleSeed() {
+    setSeedLoading(true);
+    setSeedStatus("");
+    try {
+      const targets = [
+        { name: "projects",       items: PORTFOLIO.projects || [],       key: "title"  },
+        { name: "skills",         items: PORTFOLIO.skills || [],         key: "name"   },
+        { name: "education",      items: PORTFOLIO.education || [],      key: "degree" },
+        { name: "experience",     items: PORTFOLIO.experience || [],     key: "role"   },
+        { name: "certifications", items: PORTFOLIO.certifications || [], key: "title"  },
+      ];
+      let imported = 0;
+      const restored = [];
+      const backfilled = [];
+      for (const { name, items, key } of targets) {
+        const snap = await getDocs(collection(db, name));
+        const byKey = new Map(snap.docs.map((d) => [d.data()[key], d]));
+        for (const item of items) {
+          const { id, ...data } = item;
+          if (!data[key]) continue;
+          const doc = byKey.get(data[key]);
+          if (doc) {
+            const existingData = doc.data();
+            const missing = {};
+            for (const field of ["features", "longDescription", "description"]) {
+              if (data[field] && !existingData[field]) missing[field] = data[field];
+            }
+            if (Object.keys(missing).length) {
+              await updateDoc(doc.ref, missing);
+              imported++;
+              backfilled.push(name);
+            }
+          } else if (!byKey.has(data[key])) {
+            await addDoc(collection(db, name), data);
+            imported++;
+            restored.push(name);
+          }
+        }
+      }
+      if (imported > 0) {
+        const parts = [];
+        if (restored.length) parts.push(`${[...new Set(restored)].join(", ")}`);
+        if (backfilled.length) parts.push(`fonctionnalités complétées (${[...new Set(backfilled)].join(", ")})`);
+        setSeedStatus(`✔ ${imported} mise(s) à jour effectuée(s) : ${parts.join(" ; ")}.`);
+        projects.refresh();
+        skills.refresh();
+        education.refresh();
+        experience.refresh();
+        certifications.refresh();
+      } else {
+        setSeedStatus("Rien à restaurer — toutes les données sont déjà présentes.");
+      }
+    } catch (e) {
+      setSeedStatus("Erreur d'import : " + (e?.message || e));
+    } finally {
+      setSeedLoading(false);
+    }
+  }
 
   const stats = [
     { key: "projects", icon: <RocketIcon width={20} height={20} />, num: projects.data.length, label: "Projets" },
@@ -1106,7 +1427,7 @@ export default function Dashboard() {
               letterSpacing: "0.1em",
             }}
           >
-            Studio privé
+            Espace Administration
           </span>
         </div>
         <div
@@ -1133,6 +1454,9 @@ export default function Dashboard() {
               {error}
             </span>
           )}
+          <Btn onClick={handleSeed} variant="ghost" small>
+            {seedLoading ? "Restaurer..." : "Restaurer"}
+          </Btn>
           <Btn onClick={handleLogout} variant="danger" small>
             Déconnecter
           </Btn>
@@ -1225,7 +1549,7 @@ export default function Dashboard() {
                     margin: 0,
                   }}
                 >
-                  · Studio privé ·
+                  · Espace Administration ·
                 </p>
                 <h1
                   style={{
@@ -1303,6 +1627,26 @@ export default function Dashboard() {
 
         {/* Contenu principal */}
         <div className="px-dash-main">
+          {seedStatus && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              style={{
+                marginBottom: "1.25rem",
+                padding: "0.8rem 1.1rem",
+                borderRadius: "var(--r-md)",
+                border: "1px solid var(--accent-border)",
+                background: "var(--accent-glow)",
+                fontFamily: "var(--mono)",
+                fontSize: "0.74rem",
+                color: "var(--text)",
+                lineHeight: 1.6,
+              }}
+            >
+              {seedStatus}
+            </motion.div>
+          )}
+
           {/* Compteurs "studio" */}
           <motion.div
             className="px-dash-stats"
@@ -1346,14 +1690,23 @@ export default function Dashboard() {
                 minHeight: "60vh",
               }}
             >
-              {activeTab === "projects" && <ProjectsSection />}
-              {activeTab === "skills" && <SkillsSection />}
-              {activeTab === "parcours" && <ParcoursSection />}
-              {activeTab === "certifications" && <CertificationsSection />}
+              {activeTab === "profile" && <ProfileSection />}
+              {activeTab === "projects" && <ProjectsSection confirmDelete={confirmDelete} />}
+              {activeTab === "skills" && <SkillsSection confirmDelete={confirmDelete} />}
+              {activeTab === "parcours" && <ParcoursSection confirmDelete={confirmDelete} />}
+              {activeTab === "certifications" && <CertificationsSection confirmDelete={confirmDelete} />}
             </motion.div>
           </AnimatePresence>
         </div>
       </div>
+
+      {pendingDelete && (
+        <ConfirmDialog
+          message={pendingDelete.message}
+          onCancel={() => setPendingDelete(null)}
+          onConfirm={handleConfirmDelete}
+        />
+      )}
     </div>
   );
 }

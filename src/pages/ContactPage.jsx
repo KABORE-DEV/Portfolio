@@ -1,13 +1,20 @@
 import { useState } from "react";
 import { PORTFOLIO } from "../data.js";
+import { useProfile } from "../hooks/useFirestore.js";
 import { GithubIcon, LinkedinIcon, WhatsappIcon, ArrowUpRightIcon } from "../icons.jsx";
 
 export default function ContactPage() {
-  const { email, phone, location } = PORTFOLIO.personal;
+  const { data: personal } = useProfile();
+  const profile  = personal || PORTFOLIO.personal || {};
+  const {
+    email    = PORTFOLIO.personal.email,
+    phone    = PORTFOLIO.personal.phone,
+    location = PORTFOLIO.personal.location,
+  } = profile;
   const { github, linkedin, whatsapp } = PORTFOLIO.social;
 
-  const [form, setForm] = useState({ prenom: "", name: "", email: "", subject: "", message: "" });
-  const [status, setStatus] = useState(null); // null | "ok" | "err"
+  const [form, setForm]     = useState({ prenom: "", name: "", email: "", subject: "", message: "" });
+  const [status, setStatus] = useState(null);
   const [errors, setErrors] = useState({ prenom: "", name: "", email: "", subject: "", message: "" });
 
   const handleChange = (key) => (e) => {
@@ -17,24 +24,17 @@ export default function ContactPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const errs = {};
-    if (!form.name.trim()) errs.name = "Veuillez indiquer votre nom.";
-    if (!form.prenom.trim()) errs.prenom = "Veuillez indiquer votre prénom.";
+    if (!form.name.trim())    errs.name    = "Veuillez indiquer votre nom.";
+    if (!form.prenom.trim())  errs.prenom  = "Veuillez indiquer votre prénom.";
     if (!/^\S+@\S+\.\S+$/.test(form.email.trim())) errs.email = "Adresse email invalide.";
     if (!form.subject.trim()) errs.subject = "Veuillez indiquer un sujet.";
     if (!form.message.trim()) errs.message = "Veuillez écrire votre message.";
-
-    if (Object.keys(errs).length) {
-      setErrors(errs);
-      setStatus("err");
-      return;
-    }
+    if (Object.keys(errs).length) { setErrors(errs); setStatus("err"); return; }
 
     const subject = encodeURIComponent(form.subject);
-    const body = encodeURIComponent(`${form.message}\n\n— ${form.prenom} ${form.name} (${form.email})`);
-    const mailto = `mailto:${email}?subject=${subject}&body=${body}`;
-    window.location.href = mailto;
+    const body    = encodeURIComponent(`${form.message}\n\n— ${form.prenom} ${form.name} (${form.email})`);
+    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
     setErrors({ prenom: "", name: "", email: "", subject: "", message: "" });
     setForm({ prenom: "", name: "", email: "", subject: "", message: "" });
     setStatus("ok");
@@ -42,9 +42,9 @@ export default function ContactPage() {
   };
 
   const socials = [
-    { href: github,   icon: <GithubIcon width={16} height={16} />,   label: "GitHub" },
-    { href: linkedin, icon: <LinkedinIcon width={16} height={16} />,  label: "LinkedIn" },
-    { href: whatsapp, icon: <WhatsappIcon width={16} height={16} />,  label: "WhatsApp" },
+    { href: github,   icon: <GithubIcon   width={16} height={16} />, label: "GitHub"   },
+    { href: linkedin, icon: <LinkedinIcon  width={16} height={16} />, label: "LinkedIn" },
+    { href: whatsapp, icon: <WhatsappIcon  width={16} height={16} />, label: "WhatsApp" },
   ].filter(s => s.href);
 
   return (
@@ -55,13 +55,14 @@ export default function ContactPage() {
           <span className="section-num">Contact</span>
           <h1 className="section-title">Travaillons <em>ensemble.</em></h1>
           <p className="section-desc">
-            Une collaboration, un projet, ou simplement envie de discuter — ma boîte mail est ouverte.
+            Un projet, une collaboration ou une question : je vous invite à me contacter.
           </p>
         </div>
       </div>
 
       <div className="section" style={{ paddingTop: "1rem" }}>
         <div className="container contact-grid">
+
           {/* ── Infos ─────────────────────── */}
           <div>
             <div className="contact-list">
@@ -86,7 +87,7 @@ export default function ContactPage() {
             </p>
             <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
               {socials.map(s => (
-                <a key={s.label} className="social-chip" href={s.href} target="_blank" rel="noreferrer">
+                <a key={s.label} className="social-chip" href={s.href} target="_blank" rel="noreferrer" aria-label={s.label}>
                   {s.icon} {s.label}
                 </a>
               ))}
@@ -96,7 +97,7 @@ export default function ContactPage() {
           {/* ── Formulaire ────────────────── */}
           <div className="form-card">
             <h2>Écrivez-moi</h2>
-            <p className="form-intro">Réponse garantie sous 24h — promis juré.</p>
+            <p className="form-intro">Je réponds à chaque message sous 24h.</p>
 
             <form onSubmit={handleSubmit} noValidate>
               <div className="form-grid2">
@@ -108,6 +109,7 @@ export default function ContactPage() {
                     value={form.prenom}
                     onChange={handleChange("prenom")}
                     placeholder="Votre prénom"
+                    autoComplete="given-name"
                   />
                   {errors.prenom && <p className="field-err">{errors.prenom}</p>}
                 </div>
@@ -119,6 +121,7 @@ export default function ContactPage() {
                     value={form.name}
                     onChange={handleChange("name")}
                     placeholder="Votre nom"
+                    autoComplete="family-name"
                   />
                   {errors.name && <p className="field-err">{errors.name}</p>}
                 </div>
@@ -133,6 +136,7 @@ export default function ContactPage() {
                   value={form.email}
                   onChange={handleChange("email")}
                   placeholder="vous@email.com"
+                  autoComplete="email"
                 />
                 {errors.email && <p className="field-err">{errors.email}</p>}
               </div>
@@ -162,13 +166,13 @@ export default function ContactPage() {
                 {errors.message && <p className="field-err">{errors.message}</p>}
               </div>
 
-              <button type="submit" className="btn btn-primary btn-block" style={{ marginTop: "0.5rem" }}>
+              <button type="submit" id="contact-submit" className="btn btn-primary btn-block" style={{ marginTop: "0.5rem" }}>
                 Envoyer le message <ArrowUpRightIcon width={15} height={15} />
               </button>
 
               {status === "ok" && (
                 <p className="form-status ok" style={{ marginTop: "1rem" }}>
-                  Message prêt à partir ! Votre client mail s'est ouvert.
+                  Votre message a été préparé. Votre client de messagerie s'est ouvert pour l'envoi.
                 </p>
               )}
               {status === "err" && (
@@ -178,6 +182,7 @@ export default function ContactPage() {
               )}
             </form>
           </div>
+
         </div>
       </div>
     </>

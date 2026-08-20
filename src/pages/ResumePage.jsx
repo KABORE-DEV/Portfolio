@@ -2,8 +2,10 @@ import { useCollection } from "../hooks/useFirestore.js";
 import { PORTFOLIO } from "../data.js";
 import { GraduationIcon, ArrowDownIcon } from "../icons.jsx";
 import { TECH_ICONS } from "../techIcons.jsx";
+import { motion } from "framer-motion";
+import { viewportOnce } from "../motion.js";
 
-function TimelineItem({ item, type, isLast }) {
+function TimelineItem({ item, type }) {
   const title = type === "education" ? item.degree : item.role;
   const sub   = type === "education" ? item.school : item.company;
   const date  = item.period;
@@ -18,21 +20,53 @@ function TimelineItem({ item, type, isLast }) {
   );
 }
 
-/* ── Ticket outil (boîte à outils) ─────── */
-function ToolCard({ skill }) {
+const LEVEL_SEGMENTS = {
+  practiced: 3,
+  familiar: 2,
+  learning: 1,
+};
+const LEVEL_LABELS = {
+  practiced: "Utilisé",
+  familiar: "À l'aise",
+  learning: "En cours",
+};
+
+function SkillBar({ skill }) {
   let icon = null;
   if (skill.iconType === "url" && skill.iconUrl) {
     icon = <img src={skill.iconUrl} alt={skill.name} loading="lazy" />;
   } else {
     icon = TECH_ICONS[skill.name] || TECH_ICONS[skill.iconKey] || null;
   }
+  const segments = LEVEL_SEGMENTS[skill.level] ?? 2;
+  const label    = LEVEL_LABELS[skill.level] || skill.level || "";
 
   return (
-    <div className="tool-card" title={skill.context}>
-      <div className="tool-icon">{icon}</div>
-      <div className="tool-info">
-        <p className="tool-name">{skill.name}</p>
-        <p className="tool-level">{skill.context || "—"}</p>
+    <div className="skill-bar-card" title={skill.context}>
+      <div className="skill-bar-top">
+        <div className="skill-bar-name">
+          <span className="skill-bar-icon">
+            {icon || (
+              <span style={{ fontFamily: "var(--mono)", fontSize: "0.62rem", fontWeight: 700 }}>
+                {skill.name.slice(0, 2)}
+              </span>
+            )}
+          </span>
+          <span>{skill.name}</span>
+        </div>
+        {label && <span className="skill-bar-level">{label}</span>}
+      </div>
+      <div className="skill-bar-segments" role="img" aria-label={`Niveau : ${label}`}>
+        {[0, 1, 2].map(i => (
+          <motion.span
+            key={i}
+            className={`skill-bar-seg${i < segments ? " is-on" : ""}`}
+            initial={{ opacity: 0, scaleX: 0 }}
+            whileInView={{ opacity: 1, scaleX: 1 }}
+            viewport={viewportOnce}
+            transition={{ duration: 0.4, delay: i * 0.1 }}
+          />
+        ))}
       </div>
     </div>
   );
@@ -44,9 +78,9 @@ export default function ResumePage() {
   const { data: skills }     = useCollection("skills");
 
   const allSkills = skills?.length ? skills : PORTFOLIO.skills;
-  const front = allSkills.filter(s => s.category === "front");
-  const back  = allSkills.filter(s => s.category === "back");
-  const tools = allSkills.filter(s => s.category === "tools");
+  const languages  = allSkills.filter(s => s.category === "front" || s.category === "back");
+  const frameworks = allSkills.filter(s => s.category === "framework");
+  const tools      = allSkills.filter(s => s.category === "tools");
 
   const edu = education?.length ? education : PORTFOLIO.education;
   const exp = experience?.length ? experience : PORTFOLIO.experience;
@@ -57,11 +91,11 @@ export default function ResumePage() {
       <div className="page-head">
         <div className="container">
           <span className="section-num">Parcours</span>
-          <h1 className="section-title">Le chemin, <em>jusqu'ici.</em></h1>
+          <h1 className="section-title"><em>Mon</em> parcours.</h1>
           <p className="section-desc" style={{ marginBottom: "1.75rem" }}>
-            Formation, expériences et compétences — l'histoire d'un étudiant qui aime coder.
+            Formation, expériences et compétences professionnelles.
           </p>
-          <a href="/CV_Kabore_Frank.pdf" download className="btn btn-primary">
+          <a href="/CV_Kabore_Frank.pdf" download className="btn btn-primary" id="resume-download-btn">
             Télécharger le CV <ArrowDownIcon width={14} height={14} />
           </a>
         </div>
@@ -69,6 +103,7 @@ export default function ResumePage() {
 
       <div className="section" style={{ paddingTop: "2rem" }}>
         <div className="container">
+
           {/* ═══ TIMELINE ═══════════════════ */}
           <div className="timeline-grid">
             <div>
@@ -78,7 +113,7 @@ export default function ResumePage() {
               </div>
               <div className="timeline">
                 {edu.map((item, i) => (
-                  <TimelineItem key={i} item={item} type="education" isLast={i === edu.length - 1} />
+                  <TimelineItem key={i} item={item} type="education" />
                 ))}
               </div>
             </div>
@@ -93,11 +128,11 @@ export default function ResumePage() {
               <div className="timeline">
                 {exp.length > 0
                   ? exp.map((item, i) => (
-                      <TimelineItem key={i} item={item} type="experience" isLast={i === exp.length - 1} />
+                      <TimelineItem key={i} item={item} type="experience" />
                     ))
                   : (
                     <div style={{ padding: "1.25rem 0", color: "var(--text-2)", fontSize: "0.92rem" }}>
-                      Toujours en apprentissage, prêt pour de nouveaux défis. ✦
+                      En recherche de nouvelles opportunités professionnelles.
                     </div>
                   )
                 }
@@ -109,30 +144,30 @@ export default function ResumePage() {
           <div className="skills-card">
             <div className="section-head" style={{ marginBottom: "2.25rem" }}>
               <span className="section-num">Compétences</span>
-              <h2 className="section-title">La boîte à <em>outils.</em></h2>
+              <h2 className="section-title"><em>Compétences</em> techniques.</h2>
             </div>
 
-            {front.length > 0 && (
+            {languages.length > 0 && (
               <>
-                <h4 className="tool-group-label">Front-end</h4>
-                <div className="tools-grid">
-                  {front.map(s => <ToolCard key={s.name} skill={s} />)}
+                <h4 className="tool-group-label">Langages de programmation</h4>
+                <div className="skills-bars">
+                  {languages.map(s => <SkillBar key={s.name} skill={s} />)}
                 </div>
               </>
             )}
-            {back.length > 0 && (
+            {frameworks.length > 0 && (
               <>
-                <h4 className="tool-group-label">Back-end</h4>
-                <div className="tools-grid">
-                  {back.map(s => <ToolCard key={s.name} skill={s} />)}
+                <h4 className="tool-group-label">Frameworks</h4>
+                <div className="skills-bars">
+                  {frameworks.map(s => <SkillBar key={s.name} skill={s} />)}
                 </div>
               </>
             )}
             {tools.length > 0 && (
               <>
                 <h4 className="tool-group-label">Outils</h4>
-                <div className="tools-grid">
-                  {tools.map(s => <ToolCard key={s.name} skill={s} />)}
+                <div className="skills-bars">
+                  {tools.map(s => <SkillBar key={s.name} skill={s} />)}
                 </div>
               </>
             )}
@@ -150,6 +185,7 @@ export default function ResumePage() {
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </>

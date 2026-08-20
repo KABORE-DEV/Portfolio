@@ -8,7 +8,7 @@ const firebaseConfig = {
   projectId: "portfolio-frank-kabore",
   storageBucket: "portfolio-frank-kabore.firebasestorage.app",
   messagingSenderId: "227283546340",
-  appId: "1:227283546340:web:52a7176c16fcbebf27bcf1"
+  appId: "1:227283546340:web:52a7176c16fcbebf27bcf1",
 };
 
 // Initialize Firebase

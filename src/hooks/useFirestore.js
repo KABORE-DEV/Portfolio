@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { db } from "../firebase";
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, setDoc } from "firebase/firestore";
 import { PORTFOLIO } from "../data.js";
 
 /** Hook générique pour une collection Firestore avec fallback sur data.js */
@@ -60,4 +60,46 @@ export function useCollection(collectionName) {
   };
 
   return { data: data.length > 0 ? data : fallback, loading, add, update, remove, refresh: fetchData };
+}
+
+/** Hook pour un document unique "profile" (single doc) avec fallback sur data.js */
+export function useProfile() {
+  const fallback = PORTFOLIO.personal || {};
+  const [data, setData] = useState(fallback);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const ref = doc(db, "profile", "main");
+      const snap = await getDoc(ref);
+      if (snap.exists()) {
+        setData({ ...fallback, ...snap.data() });
+      } else {
+        setData(fallback);
+      }
+    } catch (e) {
+      console.warn(`Firestore [profile] indisponible/vide, utilisation des données locales :`, e);
+      setData(fallback);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const update = async (item) => {
+    try {
+      await setDoc(doc(db, "profile", "main"), item, { merge: true });
+      setData({ ...data, ...item });
+      return true;
+    } catch (e) {
+      console.error("Erreur de mise à jour du profil Firestore:", e);
+      return false;
+    }
+  };
+
+  return { data, loading, update, refresh: fetchData };
 }

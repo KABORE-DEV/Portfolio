@@ -13,7 +13,7 @@ export const PORTFOLIO = {
     email: "kabore.dev@gmail.com",
     phone: "+226 52 76 62 73 / 06 41 84 57",
     location: "Burkina Faso · Bobo-Dioulasso",
-    bio: `Étudiant en 3ème année de génie logiciel, je suis passionné par la création d'applications web et mobiles. J'aime transformer des idées en solutions concrètes et apprendre de nouvelles technologies.`,
+    bio: `Étudiant en 3ème année de génie logiciel, je crée des applications web & mobile simples, claires et efficaces.`,
     initials: "FK",
     photo: "/frank.jpg",
   },
@@ -40,7 +40,7 @@ export const PORTFOLIO = {
     {
       name: "React",
       level: "learning",
-      category: "front",
+      category: "framework",
       context: "En cours d'apprentissage",
     },
     {
@@ -52,7 +52,7 @@ export const PORTFOLIO = {
     {
       name: "Laravel",
       level: "learning",
-      category: "back",
+      category: "framework",
       context: "Intégration dans des projets web, en cours d'apprentissage",
     },
     {
@@ -115,7 +115,8 @@ export const PORTFOLIO = {
       github: "https://github.com/KABORE-DEV/Cleaning_Services",
       demo: "https://la-voix-de-korsimoro.vercel.app",
       featured: true,
-      status: "En cours",
+      status: "En ligne",
+      image: "/projects/korsimoro.png",
     },
     {
       title: "Faso Pagnes",
@@ -134,6 +135,7 @@ export const PORTFOLIO = {
       demo: null,
       featured: true,
       status: "En cours",
+      image: "/projects/fasopagnes.png",
     },
     {
       title: "Gestion de Bibliothèque Web",
@@ -152,7 +154,7 @@ export const PORTFOLIO = {
         "https://github.com/KABORE-DEV/Gestion-Biblith-que-Web-Projet-Academique",
       demo: null,
       featured: true,
-      status: "En cours",
+      status: "Terminé",
     },
     {
       title: "Gestion de Compte Java",
@@ -170,6 +172,7 @@ export const PORTFOLIO = {
       github: "https://github.com/KABORE-DEV/Gestion-Compte-Java",
       demo: null,
       featured: false,
+      status: "Terminé",
     },
     {
       title: "Base de Données en C",
@@ -186,6 +189,7 @@ export const PORTFOLIO = {
       github: "https://github.com/KABORE-DEV/Base-de-Donn-es-C-",
       demo: null,
       featured: false,
+      status: "Terminé",
     },
     {
       title: "Morpion en Python",
@@ -202,6 +206,7 @@ export const PORTFOLIO = {
       github: "https://github.com/KABORE-DEV/Morpion-Python",
       demo: null,
       featured: false,
+      status: "Terminé",
     },
     {
       title: "Projets en langage C",
@@ -218,6 +223,7 @@ export const PORTFOLIO = {
       github: "https://github.com/KABORE-DEV/Langage-C_PROJETS",
       demo: null,
       featured: false,
+      status: "Terminé",
     },
   ],
 

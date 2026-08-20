@@ -7,36 +7,37 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="site-footer">
+    <footer className="site-footer" aria-label="Pied de page">
       <div className="container">
         <div className="footer-grid">
+
           {/* Identité */}
           <div>
             <p className="footer-name">{firstName} <em>{lastName}</em></p>
-            <p className="footer-tag">Étudiant en génie logiciel · créateur de trucs chics &amp; malins.</p>
+            <p className="footer-tag">Développeur web &amp; mobile — étudiant en Génie Logiciel.</p>
           </div>
 
-          {/* Crédit amusant */}
+          {/* Crédit */}
           <div className="footer-credit">
             <p className="footer-credit-sub">
-              © {year} <strong>{firstName} {lastName}</strong> — fait maison, de la première ligne de code au dernier pixel,
-              avec du <span className="footer-pop-accent">café</span> et un peu de <span className="footer-pop-accent">folie</span>.
+              © {year} <strong>{firstName} {lastName}</strong>. Tous droits réservés.
             </p>
           </div>
 
           {/* Liens */}
           <div className="footer-links">
             {github && (
-              <a href={github} target="_blank" rel="noreferrer" className="footer-link">
+              <a href={github} target="_blank" rel="noreferrer" className="footer-link" aria-label="GitHub">
                 <GithubIcon width={15} height={15} /> GitHub <ArrowUpRightIcon width={12} height={12} />
               </a>
             )}
             {linkedin && (
-              <a href={linkedin} target="_blank" rel="noreferrer" className="footer-link">
+              <a href={linkedin} target="_blank" rel="noreferrer" className="footer-link" aria-label="LinkedIn">
                 <LinkedinIcon width={15} height={15} /> LinkedIn <ArrowUpRightIcon width={12} height={12} />
               </a>
             )}
           </div>
+
         </div>
       </div>
     </footer>

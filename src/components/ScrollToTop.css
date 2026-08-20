@@ -2,8 +2,8 @@
   position: fixed;
   bottom: 2rem;
   right: 2rem;
-  background: var(--accent);
-  color: #fff;
+  background: var(--terra);
+  color: var(--bg);
   width: 45px;
   height: 45px;
   border-radius: 50%;
@@ -27,7 +27,7 @@
 }
 
 .scroll-to-top:hover {
-  background: var(--accent-dark);
+  background: var(--terra-light);
   transform: translateY(-5px);
   box-shadow: var(--shadow-md);
 }

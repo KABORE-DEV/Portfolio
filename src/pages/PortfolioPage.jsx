@@ -1,8 +1,21 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { useCollection } from "../hooks/useFirestore.js";
 import { PORTFOLIO } from "../data.js";
 import ProjectModal from "../components/ProjectModal.jsx";
+import ProjectRow from "../components/ProjectRow.jsx";
+import Seo from "../components/Seo.jsx";
 import { ArrowUpRightIcon } from "../icons.jsx";
+import { fadeUp, viewportOnce } from "../motion.js";
+
+const certInitials = (name = "") =>
+  name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 3)
+    .map(w => w[0])
+    .join("")
+    .toUpperCase();
 
 export default function PortfolioPage() {
   const [selected, setSelected] = useState(null);
@@ -14,65 +27,118 @@ export default function PortfolioPage() {
 
   return (
     <>
+      <Seo
+        title="Frank KABORE · Projets"
+        description="Une sélection de projets web, mobiles et d'applications logicielles de Frank KABORE — développeur web & mobile, étudiant en Génie Logiciel."
+      />
       <ProjectModal project={selected} onClose={() => setSelected(null)} />
 
-      {/* ═══ HEADER ═════════════════════════ */}
-      <div className="page-head">
+      {/* ═══ HEADER ═══════════════════════════ */}
+      <header className="page-head">
         <div className="container">
-          <span className="section-num">Projets</span>
-          <h1 className="section-title">Des projets qui <em>parlent pour moi.</em></h1>
-          <p className="section-desc">
-            Des idées transformées en vraies choses — cliquez sur un projet pour voir les détails.
-          </p>
+          <motion.span
+            className="section-num"
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+          >
+            03 · Projets
+          </motion.span>
+          <motion.h1
+            className="section-title"
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            transition={{ delay: 0.05 }}
+          >
+            Réalisations <em>&amp; projets.</em>
+          </motion.h1>
+          <motion.p
+            className="section-desc"
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            transition={{ delay: 0.10 }}
+          >
+            Une sélection de projets web, mobiles et d'applications logicielles — de la
+            conception à la mise en production.
+          </motion.p>
         </div>
-      </div>
+      </header>
 
-      <div className="section" style={{ paddingTop: "2rem" }}>
-        <div className="container">
-          {/* ═══ PROJETS ════════════════════ */}
-          <div className="list">
-            {allProjects.map((p, i) => (
-              <button key={p.id || p.title} className="list-item" onClick={() => setSelected(p)}>
-                <span className="list-num">{String(i + 1).padStart(2, "0")}</span>
-                <div style={{ textAlign: "left" }}>
-                  <h3 className="list-title">{p.title}</h3>
-                  <p className="list-desc">{p.description}</p>
-                </div>
-                <div className="list-meta">
-                  {p.status && <span className="tag" style={{ color: "var(--accent)", borderColor: "var(--accent-border)", background: "var(--accent-glow)" }}>{p.status}</span>}
-                  <span className="list-arrow"><ArrowUpRightIcon width={16} height={16} /></span>
-                </div>
-              </button>
-            ))}
-          </div>
-
-          {/* ═══ CERTIFICATIONS ═════════════ */}
-          {allCerts.length > 0 && (
-            <div style={{ marginTop: "5rem" }}>
-              <div className="section-head">
-                <span className="section-num">Certifications</span>
-                <h2 className="section-title">Les badges sur le <em>chapeau.</em></h2>
-              </div>
-              <div className="cert-list">
-                {allCerts.map((c, i) => (
-                  <div key={c.id || i} className="cert-item">
-                    <div>
-                      <p className="cert-title">
-                        {c.url
-                          ? <a href={c.url} target="_blank" rel="noreferrer">{c.title} <ArrowUpRightIcon width={13} height={13} /></a>
-                          : c.title
-                        }
-                      </p>
-                      <p style={{ color: "var(--text-2)", fontSize: "0.85rem", marginTop: "0.2rem" }}>{c.issuer}</p>
-                    </div>
-                    <span className="cert-meta"><b>{c.date}</b></span>
-                  </div>
-                ))}
-              </div>
+      <main>
+        <div className="section" style={{ paddingTop: "2rem" }}>
+          <div className="container">
+            {/* ═══ PROJETS (rangées) ═════════ */}
+            <p className="proj-list-meta">
+              {String(allProjects.length).padStart(2, "0")} projets — web, mobile &amp; logiciels
+            </p>
+            <div className="proj-cards" role="list">
+              {allProjects.map((p, i) => (
+                <ProjectRow key={p.id || p.title} project={p} index={i} onSelect={setSelected} />
+              ))}
             </div>
-          )}
+
+            {/* ═══ CERTIFICATIONS ═════════════ */}
+            {allCerts.length > 0 && (
+              <div style={{ marginTop: "6rem" }}>
+                <motion.div
+                  className="section-head"
+                  variants={fadeUp}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={viewportOnce}
+                >
+                  <span className="section-num">Certifications</span>
+                  <h2 className="section-title">
+                    Certifications <em>obtenues.</em>
+                  </h2>
+                </motion.div>
+
+                <motion.div
+                  className="certs-rail"
+                  variants={fadeUp}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={viewportOnce}
+                >
+                  {allCerts.map((c, i) => (
+                    <motion.a
+                      key={c.id || i}
+                      className="cert-tile"
+                      href={c.url || "#"}
+                      target={c.url ? "_blank" : "_self"}
+                      rel="noreferrer"
+                      whileHover={{ y: -6 }}
+                      aria-label={`Certification : ${c.title} — ${c.issuer}`}
+                    >
+                      <div className={`cert-tile-cover${c.image ? "" : " cert-cover-fallback"}`}>
+                        {c.image ? (
+                          <img src={c.image} alt={c.title} loading="lazy" />
+                        ) : (
+                          <span className="cert-cover-mono">{certInitials(c.issuer)}</span>
+                        )}
+                      </div>
+                      <div className="cert-tile-body">
+                        <div className="cert-tile-meta">
+                          <span className="cert-issuer-badge">{c.issuer}</span>
+                          <span className="cert-date">{c.date}</span>
+                        </div>
+                        <h3 className="cert-tile-title">{c.title}</h3>
+                        {c.url && (
+                          <span className="cert-card-action">
+                            Vérifier <ArrowUpRightIcon width={12} height={12} />
+                          </span>
+                        )}
+                      </div>
+                    </motion.a>
+                  ))}
+                </motion.div>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </main>
     </>
   );
 }

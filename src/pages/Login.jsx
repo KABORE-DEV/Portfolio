@@ -35,7 +35,9 @@ export default function Login({ onSuccess }) {
     try {
       setError("");
       await resetPassword(email);
-      setResetMsg(`Un email de réinitialisation vient d'être envoyé à ${email}. Vérifiez votre boîte de réception.`);
+      setResetMsg(
+        `Un email de réinitialisation vient d'être envoyé à ${email}. Vérifiez votre boîte de réception.`,
+      );
     } catch {
       setError("Impossible d'envoyer l'email. Vérifiez l'adresse saisie.");
     }
@@ -72,7 +74,8 @@ export default function Login({ onSuccess }) {
           width: "100%",
           maxWidth: "400px",
           background: "var(--color-card)",
-          backgroundImage: "linear-gradient(160deg, var(--glass-bg-strong), var(--glass-bg))",
+          backgroundImage:
+            "linear-gradient(160deg, var(--glass-bg-strong), var(--glass-bg))",
           backdropFilter: "blur(var(--glass-blur)) saturate(150%)",
           WebkitBackdropFilter: "blur(var(--glass-blur)) saturate(150%)",
           border: "1px solid var(--glass-border)",
@@ -95,64 +98,117 @@ export default function Login({ onSuccess }) {
               margin: "0 auto 1rem",
             }}
           >
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            <svg
+              viewBox="0 0 24 24"
+              width="22"
+              height="22"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
             </svg>
           </div>
-          <h2 style={{ fontSize: "1.4rem", fontWeight: 800, color: "var(--color-text)", margin: "0 0 0.4rem" }}>
+          <h2
+            style={{
+              fontSize: "1.4rem",
+              fontWeight: 800,
+              color: "var(--color-text)",
+              margin: "0 0 0.4rem",
+            }}
+          >
             Espace Admin
           </h2>
-          <p style={{ fontSize: "0.85rem", color: "var(--color-text-muted)", margin: 0 }}>
+          <p
+            style={{
+              fontSize: "0.85rem",
+              color: "var(--color-text-muted)",
+              margin: 0,
+            }}
+          >
             Connectez-vous pour gérer votre portfolio
           </p>
         </div>
 
         {error && (
-          <div style={{
-            background: "rgba(239, 68, 68, 0.1)",
-            border: "1px solid rgba(239, 68, 68, 0.3)",
-            color: "#ef4444",
-            padding: "10px 14px",
-            borderRadius: "var(--radius-sm)",
-            fontSize: "0.82rem",
-            marginBottom: "1.25rem",
-            textAlign: "center",
-          }}>
+          <div
+            style={{
+              background: "rgba(239, 68, 68, 0.1)",
+              border: "1px solid rgba(239, 68, 68, 0.3)",
+              color: "#ef4444",
+              padding: "10px 14px",
+              borderRadius: "var(--radius-sm)",
+              fontSize: "0.82rem",
+              marginBottom: "1.25rem",
+              textAlign: "center",
+            }}
+          >
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
+        <form
+          onSubmit={handleSubmit}
+          style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}
+        >
           <div>
-            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "var(--color-text-muted)", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+            <label
+              style={{
+                display: "block",
+                fontSize: "0.75rem",
+                fontWeight: 700,
+                color: "var(--color-text-muted)",
+                marginBottom: "6px",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+              }}
+            >
               Email
             </label>
             <input
               type="email"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="votre@email.com"
               required
               style={inputStyle}
-              onFocus={e => e.target.style.borderColor = "var(--color-accent)"}
-              onBlur={e => e.target.style.borderColor = "var(--color-border)"}
+              onFocus={(e) =>
+                (e.target.style.borderColor = "var(--color-accent)")
+              }
+              onBlur={(e) =>
+                (e.target.style.borderColor = "var(--color-border)")
+              }
             />
           </div>
 
           <div>
-            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "var(--color-text-muted)", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+            <label
+              style={{
+                display: "block",
+                fontSize: "0.75rem",
+                fontWeight: 700,
+                color: "var(--color-text-muted)",
+                marginBottom: "6px",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+              }}
+            >
               Mot de passe
             </label>
             <input
               type="password"
               value={password}
-              onChange={e => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
               style={inputStyle}
-              onFocus={e => e.target.style.borderColor = "var(--color-accent)"}
-              onBlur={e => e.target.style.borderColor = "var(--color-border)"}
+              onFocus={(e) =>
+                (e.target.style.borderColor = "var(--color-accent)")
+              }
+              onBlur={(e) =>
+                (e.target.style.borderColor = "var(--color-border)")
+              }
             />
           </div>
 
@@ -171,8 +227,12 @@ export default function Login({ onSuccess }) {
               transition: "background var(--transition-base)",
               marginTop: "0.5rem",
             }}
-            onMouseEnter={e => e.currentTarget.style.background = "var(--color-accent-dark)"}
-            onMouseLeave={e => e.currentTarget.style.background = "var(--color-accent)"}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.background = "var(--color-accent-dark)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.background = "var(--color-accent)")
+            }
           >
             {loading ? "Connexion en cours..." : "Se connecter"}
           </button>
@@ -193,25 +253,32 @@ export default function Login({ onSuccess }) {
               transition: "color 0.2s",
               fontFamily: "var(--font)",
             }}
-            onMouseEnter={e => e.currentTarget.style.color = "var(--color-accent)"}
-            onMouseLeave={e => e.currentTarget.style.color = "var(--color-text-muted)"}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.color = "var(--color-accent)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.color = "var(--color-text-muted)")
+            }
           >
             Mot de passe oublié ?
           </button>
 
           {resetMsg && (
-            <p style={{
-              background: "var(--color-accent-glow)",
-              border: "1px solid var(--color-accent-border, rgba(255,77,36,0.28))",
-              color: "var(--color-accent)",
-              padding: "10px 14px",
-              borderRadius: "var(--radius-sm)",
-              fontSize: "0.82rem",
-              textAlign: "center",
-              lineHeight: 1.5,
-              margin: 0,
-            }}>
-              ✦ {resetMsg}
+            <p
+              style={{
+                background: "var(--color-accent-glow)",
+                border:
+                  "1px solid var(--color-accent-border, rgba(255,77,36,0.28))",
+                color: "var(--color-accent)",
+                padding: "10px 14px",
+                borderRadius: "var(--radius-sm)",
+                fontSize: "0.82rem",
+                textAlign: "center",
+                lineHeight: 1.5,
+                margin: 0,
+              }}
+            >
+              {resetMsg}
             </p>
           )}
         </form>
