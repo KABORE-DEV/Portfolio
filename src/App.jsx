@@ -44,23 +44,10 @@ function AdminSection({ onBack }) {
   const { currentUser, loading } = useAuth();
   return (
     <div>
-      <div className="admin-bar" style={{
-        position: "sticky", top: "var(--nav-h)", zIndex: 50,
-        background: "var(--surface)", borderBottom: "1px solid var(--border)",
-        padding: "0.875rem 2rem", display: "flex", alignItems: "center",
-        justifyContent: "space-between",
-      }}>
-        <button onClick={onBack} className="btn btn-outline" style={{ padding: "7px 16px", fontSize: "0.82rem" }}>
-          ← Retour
-        </button>
-        <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-          Espace Administration
-        </span>
-      </div>
       {loading
         ? <div style={{ padding: "4rem", textAlign: "center", color: "var(--text-2)", fontSize: "0.9rem" }}>Chargement…</div>
         : currentUser
-          ? <Suspense fallback={<div style={{ padding: "4rem", textAlign: "center", color: "var(--text-2)" }}>Chargement…</div>}><Dashboard /></Suspense>
+          ? <Suspense fallback={<div style={{ padding: "4rem", textAlign: "center", color: "var(--text-2)" }}>Chargement…</div>}><Dashboard onBack={onBack} /></Suspense>
           : <Suspense fallback={<div style={{ padding: "4rem", textAlign: "center", color: "var(--text-2)" }}>Chargement…</div>}><Login /></Suspense>
       }
     </div>

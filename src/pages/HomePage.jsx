@@ -27,7 +27,7 @@ const PROCESS = [
 
 export default function HomePage({ onNavigate }) {
   const [selected, setSelected] = useState(null);
-  const { data: personal } = useProfile();
+  const { data: personal, loading: profileLoading } = useProfile();
   const { firstName, lastName, title, bio, photo, initials, email } = personal || PORTFOLIO.personal;
   const { github, linkedin, whatsapp } = PORTFOLIO.social;
   const { data: projects } = useCollection("projects");
@@ -99,7 +99,7 @@ export default function HomePage({ onNavigate }) {
             <div className="hero-photo">
               <div className="hero-photo-shift" aria-hidden="true" />
               <div className="hero-photo-img">
-                {photo
+                {photo && !profileLoading
                   ? <img src={photo} alt={`Photo de ${firstName} ${lastName}`} />
                   : <div className="hero-photo-initials">{initials}</div>
                 }

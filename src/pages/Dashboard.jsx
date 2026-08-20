@@ -434,7 +434,7 @@ function ListRow({ main, sub, onEdit, onDelete, thumb }) {
           )}
         </div>
       </div>
-      <div style={{ display: "flex", gap: "0.5rem", marginLeft: "auto", flexShrink: 0 }}>
+      <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginLeft: "auto", justifyContent: "flex-end", flexShrink: 0, minWidth: 0 }}>
         <Btn onClick={onEdit} variant="accent" small>Modifier</Btn>
         <Btn onClick={onDelete} variant="danger" small>Supprimer</Btn>
       </div>
@@ -1248,7 +1248,7 @@ const tabs = [
   { key: "certifications", label: "Certifications" },
 ];
 
-export default function Dashboard() {
+export default function Dashboard({ onBack }) {
   const { currentUser, logout } = useAuth();
   const [activeTab, setActiveTab] = useState("projects");
   const [error, setError] = useState("");
@@ -1383,8 +1383,8 @@ export default function Dashboard() {
           className="px-dash-header-left"
           style={{ display: "flex", alignItems: "center", gap: "16px" }}
         >
-          <a
-            href="/"
+          <button
+            onClick={onBack}
             style={{
               display: "flex",
               alignItems: "center",
@@ -1392,7 +1392,10 @@ export default function Dashboard() {
               fontSize: "0.78rem",
               fontFamily: "var(--mono)",
               color: "var(--text-2)",
-              textDecoration: "none",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: 0,
               transition: "color var(--fast)",
               borderBottom: "1px solid transparent",
             }}
@@ -1415,7 +1418,7 @@ export default function Dashboard() {
               <path d="M19 12H5M12 5l-7 7 7 7" />
             </svg>
             Retour au site
-          </a>
+          </button>
           <span style={{ color: "var(--border)", fontSize: "1.1rem" }}>·</span>
           <span
             style={{
