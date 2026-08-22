@@ -1,51 +1,80 @@
 import { useState } from "react";
 import { PORTFOLIO } from "../data.js";
 import { useCollection, useProfile } from "../hooks/useFirestore.js";
-import { GithubIcon, LinkedinIcon, WhatsappIcon, ArrowUpRightIcon, ArrowDownIcon } from "../icons.jsx";
+import {
+  GithubIcon,
+  LinkedinIcon,
+  WhatsappIcon,
+  ArrowUpRightIcon,
+  ArrowDownIcon,
+} from "../icons.jsx";
 import ProjectModal from "../components/ProjectModal.jsx";
 import ProjectRow from "../components/ProjectRow.jsx";
 
 const DEFAULT_MARQUEE = [
-  "Développement Web", "React", "Laravel",
-  "Bases de données", "Git", "PHP", "Java", "MySQL",
+  "Développement Web",
+  "React",
+  "Laravel",
+  "Bases de données",
+  "Git",
+  "PHP",
+  "Java",
+  "MySQL",
 ];
 
 const PROCESS = [
-  { title: "Analyse",       desc: "Comprendre votre besoin et vos objectifs." },
-  { title: "Conception",    desc: "Architecture, maquettes et choix techniques." },
-  { title: "Développement", desc: "Code propre, testé, adapté à tous les écrans." },
+  { title: "Analyse", desc: "Comprendre votre besoin et vos objectifs." },
+  { title: "Conception", desc: "Architecture, maquettes et choix techniques." },
+  {
+    title: "Développement",
+    desc: "Code propre, testé, adapté à tous les écrans.",
+  },
   { title: "Mise en ligne", desc: "Déploiement, suivi et évolutions." },
 ];
 
 export default function HomePage({ onNavigate }) {
   const [selected, setSelected] = useState(null);
   const { data: personal, loading: profileLoading } = useProfile();
-  const { firstName, lastName, title, bio, initials, email } = personal || PORTFOLIO.personal;
+  const { firstName, lastName, title, bio, initials, email } =
+    personal || PORTFOLIO.personal;
   // Photo dispo immédiatement si en cache ; initiales seulement lors du tout premier chargement
-  const photo = profileLoading && !personal ? null : (personal || PORTFOLIO.personal).photo;
+  const photo =
+    profileLoading && !personal ? null : (personal || PORTFOLIO.personal).photo;
   const { github, linkedin, whatsapp } = PORTFOLIO.social;
   const { data: projects } = useCollection("projects");
-  const { data: skills }   = useCollection("skills");
+  const { data: skills } = useCollection("skills");
   const { data: services } = useCollection("services");
 
   const expertises = services?.length ? services : PORTFOLIO.services;
 
   const marqueeItems = (skills && skills.length ? skills : PORTFOLIO.skills)
-    .map(s => s.name)
+    .map((s) => s.name)
     .filter(Boolean);
   const marquee = marqueeItems.length ? marqueeItems : DEFAULT_MARQUEE;
 
   const featured = projects?.length
-    ? (projects.filter(p => p.featured).length
-        ? projects.filter(p => p.featured).slice(0, 3)
-        : projects.slice(0, 3))
-    : PORTFOLIO.projects.filter(p => p.featured).slice(0, 3);
+    ? projects.filter((p) => p.featured).length
+      ? projects.filter((p) => p.featured).slice(0, 3)
+      : projects.slice(0, 3)
+    : PORTFOLIO.projects.filter((p) => p.featured).slice(0, 3);
 
   const socials = [
-    { href: github,   icon: <GithubIcon   width={15} height={15} />, label: "GitHub"   },
-    { href: linkedin, icon: <LinkedinIcon  width={15} height={15} />, label: "LinkedIn" },
-    { href: whatsapp, icon: <WhatsappIcon  width={15} height={15} />, label: "WhatsApp" },
-  ].filter(s => s.href);
+    {
+      href: github,
+      icon: <GithubIcon width={15} height={15} />,
+      label: "GitHub",
+    },
+    {
+      href: linkedin,
+      icon: <LinkedinIcon width={15} height={15} />,
+      label: "LinkedIn",
+    },
+    {
+      href: whatsapp,
+      icon: <WhatsappIcon width={15} height={15} />,
+      label: "WhatsApp",
+    },
+  ].filter((s) => s.href);
 
   return (
     <>
@@ -60,29 +89,55 @@ export default function HomePage({ onNavigate }) {
               <span className="hero-line2">Développeur web &amp; mobile.</span>
             </h1>
             <p className="hero-sub">
-              Étudiant en Génie Logiciel, je conçois des sites et applications web &amp; mobile.
+              Étudiant en Génie Logiciel, je conçois des sites et applications
+              web &amp; mobile.
             </p>
 
             <div className="hero-actions">
-              <button className="btn btn-primary" onClick={() => onNavigate("portfolio")} id="hero-cta-projects">
+              <button
+                className="btn btn-primary"
+                onClick={() => onNavigate("portfolio")}
+                id="hero-cta-projects"
+              >
                 Voir les projets <ArrowUpRightIcon width={15} height={15} />
               </button>
-              <button className="btn btn-ghost" onClick={() => onNavigate("contact")} id="hero-cta-contact">
+              <button
+                className="btn btn-ghost"
+                onClick={() => onNavigate("contact")}
+                id="hero-cta-contact"
+              >
                 Me contacter
               </button>
-              <a className="btn btn-ghost" href="/CV_Kabore_Frank.pdf" download aria-label="Télécharger CV">
+              <a
+                className="btn btn-ghost"
+                href="/CV_Kabore_Frank.pdf"
+                download
+                aria-label="Télécharger CV"
+              >
                 <ArrowDownIcon width={14} height={14} /> CV
               </a>
             </div>
 
             <div className="hero-socials">
-              {socials.map(s => (
-                <a key={s.label} className="social-chip" href={s.href} target="_blank" rel="noreferrer" aria-label={s.label}>
+              {socials.map((s) => (
+                <a
+                  key={s.label}
+                  className="social-chip"
+                  href={s.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={s.label}
+                >
                   {s.icon} {s.label}
                 </a>
               ))}
               <span className="sep">·</span>
-              <a className="social-chip" href={`mailto:${email}`} style={{ fontFamily: "var(--mono)", fontSize: "0.76rem" }} aria-label={`Email : ${email}`}>
+              <a
+                className="social-chip"
+                href={`mailto:${email}`}
+                style={{ fontFamily: "var(--mono)", fontSize: "0.76rem" }}
+                aria-label={`Email : ${email}`}
+              >
                 {email}
               </a>
             </div>
@@ -93,14 +148,19 @@ export default function HomePage({ onNavigate }) {
             <div className="hero-photo">
               <div className="hero-photo-shift" aria-hidden="true" />
               <div className="hero-photo-img">
-                {photo
-                  ? <img src={photo} alt={`Photo de ${firstName} ${lastName}`} />
-                  : <div className="hero-photo-initials">{initials}</div>
-                }
+                {photo ? (
+                  <img src={photo} alt={`Photo de ${firstName} ${lastName}`} />
+                ) : (
+                  <div className="hero-photo-initials">{initials}</div>
+                )}
               </div>
-              <span className="hero-photo-status"><i aria-hidden="true" /> Disponible</span>
+              <span className="hero-photo-status">
+                <i aria-hidden="true" /> Disponible
+              </span>
               <div className="hero-photo-caption">
-                <p className="hero-photo-name">{firstName} {lastName}</p>
+                <p className="hero-photo-name">
+                  {firstName} {lastName}
+                </p>
                 <p className="hero-photo-role">{title}</p>
               </div>
             </div>
@@ -124,12 +184,17 @@ export default function HomePage({ onNavigate }) {
         <div className="container">
           <div className="status-box">
             <p className="status-line">
-              Passionné de <strong>développement web</strong> · Des idées aux applications en ligne
+              Passionné de <strong>développement web</strong> · Des idées aux
+              applications en ligne
             </p>
             <div className="tech-badges">
-              {(skills && skills.length ? skills : PORTFOLIO.skills).map((s) => (
-                <span className="tech-badge" key={s.name}>{s.name}</span>
-              ))}
+              {(skills && skills.length ? skills : PORTFOLIO.skills).map(
+                (s) => (
+                  <span className="tech-badge" key={s.name}>
+                    {s.name}
+                  </span>
+                ),
+              )}
             </div>
           </div>
         </div>
@@ -139,29 +204,43 @@ export default function HomePage({ onNavigate }) {
       <section className="bio-strip" aria-label="Bio">
         <div className="container">
           <span className="section-num">À propos</span>
-          <p className="bio-text">
-            {bio}
-          </p>
+          <p className="bio-text">{bio}</p>
         </div>
       </section>
 
       {/* ═══ SERVICES ══════════════════════ */}
-      <section className="section" style={{ paddingTop: "2rem" }} id="services" aria-label="Services">
+      <section
+        className="section"
+        style={{ paddingTop: "2rem" }}
+        id="services"
+        aria-label="Services"
+      >
         <div className="container">
           <div className="section-head">
             <span className="section-num">01 · Expertises</span>
-            <h2 className="section-title">Mes <em>compétences.</em></h2>
+            <h2 className="section-title">
+              Mes <em>compétences.</em>
+            </h2>
           </div>
 
           <div className="service-grid" role="list">
             {expertises.map((s, i) => (
-              <button key={s.title} className="service-card" role="listitem" onClick={() => onNavigate("portfolio")}>
-                <span className="service-num">{String(i + 1).padStart(2, "0")}</span>
+              <button
+                key={s.title}
+                className="service-card"
+                role="listitem"
+                onClick={() => onNavigate("portfolio")}
+              >
+                <span className="service-num">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
                 <h3 className="service-title">{s.title}</h3>
                 <p className="service-desc">{s.desc}</p>
                 <div className="service-foot">
                   <span className="tag">{s.tag}</span>
-                  <span className="service-arrow" aria-hidden="true"><ArrowUpRightIcon width={14} height={14} /></span>
+                  <span className="service-arrow" aria-hidden="true">
+                    <ArrowUpRightIcon width={14} height={14} />
+                  </span>
                 </div>
               </button>
             ))}
@@ -170,21 +249,46 @@ export default function HomePage({ onNavigate }) {
       </section>
 
       {/* ═══ PROJETS À LA UNE ══════════════ */}
-      <section className="section" style={{ paddingTop: "1rem" }} id="work" aria-label="Projets sélectionnés">
+      <section
+        className="section"
+        style={{ paddingTop: "1rem" }}
+        id="work"
+        aria-label="Projets sélectionnés"
+      >
         <div className="container">
-          <div className="section-head" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: "1rem", flexWrap: "wrap" }}>
+          <div
+            className="section-head"
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-end",
+              gap: "1rem",
+              flexWrap: "wrap",
+            }}
+          >
             <div>
               <span className="section-num">02 · Sélection</span>
-              <h2 className="section-title"><em>Quelques projets</em> réalisés.</h2>
+              <h2 className="section-title">
+                <em>Quelques projets</em> réalisés.
+              </h2>
             </div>
-            <button className="btn btn-ghost" onClick={() => onNavigate("portfolio")} id="see-all-projects">
+            <button
+              className="btn btn-ghost"
+              onClick={() => onNavigate("portfolio")}
+              id="see-all-projects"
+            >
               Voir tous les projets <ArrowUpRightIcon width={14} height={14} />
             </button>
           </div>
 
           <div className="proj-cards proj-cards--tri" role="list">
             {featured.map((p, i) => (
-              <ProjectRow key={p.id || p.title} project={p} index={i} onSelect={setSelected} />
+              <ProjectRow
+                key={p.id || p.title}
+                project={p}
+                index={i}
+                onSelect={setSelected}
+              />
             ))}
           </div>
         </div>
@@ -195,7 +299,9 @@ export default function HomePage({ onNavigate }) {
         <div className="container">
           <div className="section-head">
             <span className="section-num">03 · Méthode</span>
-            <h2 className="section-title">Ma méthode de <em>travail.</em></h2>
+            <h2 className="section-title">
+              Ma méthode de <em>travail.</em>
+            </h2>
           </div>
 
           <div className="process-grid">
