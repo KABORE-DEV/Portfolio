@@ -3,12 +3,28 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { collection, getDocs, addDoc, updateDoc } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContext";
-import { useCollection, useProfile } from "../hooks/useFirestore";
+import { useCollection, useProfile, useFooter } from "../hooks/useFirestore";
 import { TECH_ICONS } from "../techIcons.jsx";
-import { RocketIcon, ZapIcon, GraduationIcon, BriefcaseIcon, AwardIcon, ServiceIcon } from "../icons.jsx";
+import {
+  RocketIcon,
+  ZapIcon,
+  GraduationIcon,
+  BriefcaseIcon,
+  AwardIcon,
+  ServiceIcon,
+  FooterIcon,
+  MailIcon,
+  TrashIcon,
+  PlusIcon,
+  GithubIcon,
+  LinkedinIcon,
+  WhatsappIcon,
+  ArrowUpRightIcon,
+} from "../icons.jsx";
 import { PORTFOLIO } from "../data.js";
 import { db } from "../firebase.js";
 import ImageUploader from "../components/ImageUploader.jsx";
+import PdfUploader from "../components/PdfUploader.jsx";
 import { stopLenis, startLenis } from "../lib/scroll.js";
 
 /* ═══════════════════════════════════════
@@ -104,6 +120,65 @@ function Select({ label, value, onChange, options }) {
           </option>
         ))}
       </select>
+    </div>
+  );
+}
+
+function ToggleField({ label, checked, onChange, description }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: "1rem",
+        padding: "10px 14px",
+        background: "rgba(255, 255, 255, 0.03)",
+        border: "1px solid var(--border)",
+        borderRadius: "var(--r-md)",
+        marginBottom: "0.8rem",
+      }}
+    >
+      <div>
+        <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text)" }}>
+          {label}
+        </span>
+        {description && (
+          <p style={{ margin: "2px 0 0", fontSize: "0.72rem", color: "var(--text-2)" }}>
+            {description}
+          </p>
+        )}
+      </div>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        onClick={() => onChange(!checked)}
+        style={{
+          width: "44px",
+          height: "24px",
+          borderRadius: "12px",
+          background: checked ? "var(--accent)" : "rgba(255, 255, 255, 0.18)",
+          border: "none",
+          cursor: "pointer",
+          position: "relative",
+          transition: "background var(--fast)",
+          padding: "2px",
+          flexShrink: 0,
+        }}
+      >
+        <div
+          style={{
+            width: "20px",
+            height: "20px",
+            borderRadius: "50%",
+            background: "#fff",
+            transform: checked ? "translateX(20px)" : "translateX(0)",
+            transition: "transform var(--fast)",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
+          }}
+        />
+      </button>
     </div>
   );
 }
@@ -1239,6 +1314,12 @@ function ProfileSection() {
             square
           />
 
+          <PdfUploader
+            label="Curriculum Vitae (CV PDF)"
+            value={form.cvUrl || "/CV_Kabore_Frank.pdf"}
+            onChange={set("cvUrl")}
+          />
+
           <Input
             label="Prénom"
             value={form.firstName}
@@ -1313,6 +1394,586 @@ function ProfileSection() {
                 ✔ Enregistré
               </span>
             )}
+          </div>
+
+          {/* ── Section Pied de page intégrée dans l'onglet Profil ── */}
+          <div
+            id="profile-footer-section"
+            style={{
+              marginTop: "3rem",
+              paddingTop: "2.5rem",
+              borderTop: "1px solid var(--border)",
+            }}
+          >
+            <FooterSection />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════
+   Section Pied de page — Réseaux, droits, mentions
+═══════════════════════════════════════ */
+function FooterSection() {
+  const { data: profile } = useProfile();
+  const { data, loading, update } = useFooter();
+  const [form, setForm] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    if (!loading && data && form === null) {
+      setForm({
+        tagline:
+          data.tagline !== undefined
+            ? data.tagline
+            : PORTFOLIO.footer?.tagline ||
+              "Développeur web & mobile — étudiant en Génie Logiciel.",
+        copyrightText:
+          data.copyrightText !== undefined
+            ? data.copyrightText
+            : PORTFOLIO.footer?.copyrightText || "Tous droits réservés.",
+        customName: data.customName || "",
+        showGithub: data.showGithub ?? true,
+        showLinkedin: data.showLinkedin ?? true,
+        showWhatsapp: data.showWhatsapp ?? false,
+        showEmail: data.showEmail ?? false,
+        githubUrl: data.githubUrl || PORTFOLIO.social.github || "",
+        linkedinUrl: data.linkedinUrl || PORTFOLIO.social.linkedin || "",
+        whatsappUrl: data.whatsappUrl || PORTFOLIO.social.whatsapp || "",
+        emailUrl: data.emailUrl || PORTFOLIO.personal.email || "",
+        customLinks: Array.isArray(data.customLinks) ? data.customLinks : [],
+      });
+    }
+  }, [loading, data, form]);
+
+  const set = (key) => (v) => setForm((f) => ({ ...f, [key]: v }));
+
+  const addCustomLink = () => {
+    setForm((f) => ({
+      ...f,
+      customLinks: [...(f.customLinks || []), { label: "", url: "" }],
+    }));
+  };
+
+  const updateCustomLink = (index, field, value) => {
+    setForm((f) => {
+      const updated = [...(f.customLinks || [])];
+      updated[index] = { ...updated[index], [field]: value };
+      return { ...f, customLinks: updated };
+    });
+  };
+
+  const removeCustomLink = (index) => {
+    setForm((f) => ({
+      ...f,
+      customLinks: (f.customLinks || []).filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleSave = async () => {
+    if (!form) return;
+    setSaving(true);
+    setSaved(false);
+    const ok = await update(form);
+    setSaving(false);
+    if (ok) {
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    }
+  };
+
+  const handleReset = () => {
+    if (!window.confirm("Rétablir les valeurs par défaut du pied de page ?")) return;
+    setForm({
+      tagline: PORTFOLIO.footer?.tagline || "Développeur web & mobile — étudiant en Génie Logiciel.",
+      copyrightText: PORTFOLIO.footer?.copyrightText || "Tous droits réservés.",
+      customName: "",
+      showGithub: true,
+      showLinkedin: true,
+      showWhatsapp: false,
+      showEmail: false,
+      githubUrl: PORTFOLIO.social.github || "",
+      linkedinUrl: PORTFOLIO.social.linkedin || "",
+      whatsappUrl: PORTFOLIO.social.whatsapp || "",
+      emailUrl: PORTFOLIO.personal.email || "",
+      customLinks: [],
+    });
+  };
+
+  const profileFirstName = profile?.firstName || PORTFOLIO.personal.firstName;
+  const profileLastName = profile?.lastName || PORTFOLIO.personal.lastName;
+  const defaultDisplayName = `${profileFirstName} ${profileLastName}`;
+  const year = new Date().getFullYear();
+
+  return (
+    <div>
+      <div
+        style={{
+          marginBottom: "1.5rem",
+          paddingBottom: "1.1rem",
+          borderBottom: "1px solid var(--border)",
+        }}
+      >
+        <h3
+          style={{
+            fontFamily: "var(--font-head)",
+            fontSize: "1.45rem",
+            fontWeight: 600,
+            letterSpacing: "-0.02em",
+            color: "var(--text)",
+            margin: 0,
+          }}
+        >
+          Pied de page
+        </h3>
+        <p
+          style={{
+            fontFamily: "var(--mono)",
+            fontSize: "0.68rem",
+            color: "var(--text-2)",
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            margin: "4px 0 0",
+          }}
+        >
+          Personnalisation des textes, crédits, réseaux sociaux et liens
+        </p>
+      </div>
+
+      {loading || !form ? (
+        <p style={{ color: "var(--text-2)" }}>Chargement...</p>
+      ) : (
+        <div>
+          {/* ── Bloc Identité & Tagline ── */}
+          <div
+            style={{
+              background: "rgba(255, 255, 255, 0.02)",
+              border: "1px solid var(--border)",
+              borderRadius: "var(--r-lg)",
+              padding: "1.25rem",
+              marginBottom: "1.5rem",
+            }}
+          >
+            <h4
+              style={{
+                fontSize: "0.95rem",
+                fontWeight: 600,
+                color: "var(--text)",
+                margin: "0 0 1rem",
+              }}
+            >
+              1. Identité &amp; Textes du pied de page
+            </h4>
+
+            <Input
+              label="Nom personnalisé affiché (optionnel)"
+              value={form.customName}
+              onChange={set("customName")}
+              placeholder={`Par défaut : ${defaultDisplayName}`}
+            />
+
+            <TextArea
+              label="Phrase d'accroche / Tagline"
+              value={form.tagline}
+              onChange={set("tagline")}
+              placeholder="Développeur web & mobile — étudiant en Génie Logiciel."
+              rows={2}
+            />
+
+            <Input
+              label="Mention des droits (Copyright)"
+              value={form.copyrightText}
+              onChange={set("copyrightText")}
+              placeholder="Tous droits réservés."
+            />
+          </div>
+
+          {/* ── Bloc Réseaux Sociaux ── */}
+          <div
+            style={{
+              background: "rgba(255, 255, 255, 0.02)",
+              border: "1px solid var(--border)",
+              borderRadius: "var(--r-lg)",
+              padding: "1.25rem",
+              marginBottom: "1.5rem",
+            }}
+          >
+            <h4
+              style={{
+                fontSize: "0.95rem",
+                fontWeight: 600,
+                color: "var(--text)",
+                margin: "0 0 1rem",
+              }}
+            >
+              2. Réseaux sociaux &amp; Contacts
+            </h4>
+
+            {/* GitHub */}
+            <ToggleField
+              label="Afficher le lien GitHub"
+              checked={form.showGithub}
+              onChange={set("showGithub")}
+              description="Affiche le bouton avec icône GitHub dans le footer"
+            />
+            {form.showGithub && (
+              <Input
+                label="URL GitHub"
+                value={form.githubUrl}
+                onChange={set("githubUrl")}
+                placeholder="https://github.com/..."
+              />
+            )}
+
+            {/* LinkedIn */}
+            <ToggleField
+              label="Afficher le lien LinkedIn"
+              checked={form.showLinkedin}
+              onChange={set("showLinkedin")}
+              description="Affiche le bouton avec icône LinkedIn dans le footer"
+            />
+            {form.showLinkedin && (
+              <Input
+                label="URL LinkedIn"
+                value={form.linkedinUrl}
+                onChange={set("linkedinUrl")}
+                placeholder="https://www.linkedin.com/in/..."
+              />
+            )}
+
+            {/* WhatsApp */}
+            <ToggleField
+              label="Afficher le lien WhatsApp"
+              checked={form.showWhatsapp}
+              onChange={set("showWhatsapp")}
+              description="Permet aux visiteurs de vous contacter directement sur WhatsApp"
+            />
+            {form.showWhatsapp && (
+              <Input
+                label="Lien ou numéro WhatsApp"
+                value={form.whatsappUrl}
+                onChange={set("whatsappUrl")}
+                placeholder="https://wa.me/226... ou +226..."
+              />
+            )}
+
+            {/* Email */}
+            <ToggleField
+              label="Afficher le lien Email"
+              checked={form.showEmail}
+              onChange={set("showEmail")}
+              description="Ouvre le client de messagerie du visiteur"
+            />
+            {form.showEmail && (
+              <Input
+                label="Adresse Email de contact"
+                type="email"
+                value={form.emailUrl}
+                onChange={set("emailUrl")}
+                placeholder="kabore.dev@gmail.com"
+              />
+            )}
+          </div>
+
+          {/* ── Bloc Liens Personnalisés ── */}
+          <div
+            style={{
+              background: "rgba(255, 255, 255, 0.02)",
+              border: "1px solid var(--border)",
+              borderRadius: "var(--r-lg)",
+              padding: "1.25rem",
+              marginBottom: "1.5rem",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "1rem",
+              }}
+            >
+              <div>
+                <h4
+                  style={{
+                    fontSize: "0.95rem",
+                    fontWeight: 600,
+                    color: "var(--text)",
+                    margin: 0,
+                  }}
+                >
+                  3. Liens personnalisés additionnels
+                </h4>
+                <p
+                  style={{
+                    margin: "3px 0 0",
+                    fontSize: "0.74rem",
+                    color: "var(--text-2)",
+                  }}
+                >
+                  Ajoutez d'autres liens (Portfolio PDF, Malt, Medium, Twitter/X...)
+                </p>
+              </div>
+              <Btn onClick={addCustomLink} variant="accent" small>
+                <PlusIcon width={13} height={13} /> Ajouter un lien
+              </Btn>
+            </div>
+
+            {form.customLinks?.length === 0 ? (
+              <p
+                style={{
+                  fontSize: "0.78rem",
+                  color: "var(--text-2)",
+                  fontStyle: "italic",
+                  margin: 0,
+                }}
+              >
+                Aucun lien personnalisé supplémentaire configuré.
+              </p>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                {form.customLinks.map((link, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1.5fr auto",
+                      gap: "0.75rem",
+                      alignItems: "center",
+                      padding: "8px 12px",
+                      background: "rgba(255, 255, 255, 0.02)",
+                      border: "1px solid var(--border)",
+                      borderRadius: "var(--r-md)",
+                    }}
+                  >
+                    <input
+                      type="text"
+                      placeholder="Libellé (ex: Twitter / X)"
+                      value={link.label}
+                      onChange={(e) => updateCustomLink(idx, "label", e.target.value)}
+                      style={{ ...inputStyle, padding: "8px 10px" }}
+                    />
+                    <input
+                      type="url"
+                      placeholder="https://..."
+                      value={link.url}
+                      onChange={(e) => updateCustomLink(idx, "url", e.target.value)}
+                      style={{ ...inputStyle, padding: "8px 10px" }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeCustomLink(idx)}
+                      title="Supprimer ce lien"
+                      style={{
+                        background: "transparent",
+                        border: "none",
+                        color: "#e5484d",
+                        cursor: "pointer",
+                        padding: "6px",
+                        display: "flex",
+                        alignItems: "center",
+                        borderRadius: "var(--r-sm)",
+                      }}
+                    >
+                      <TrashIcon width={16} height={16} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* ── Aperçu en direct (Live Preview) ── */}
+          <div
+            style={{
+              background: "var(--surface)",
+              border: "1px solid var(--accent-border)",
+              borderRadius: "var(--r-lg)",
+              padding: "1.5rem",
+              marginBottom: "1.5rem",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                marginBottom: "1rem",
+              }}
+            >
+              <span
+                style={{
+                  display: "inline-block",
+                  width: "8px",
+                  height: "8px",
+                  borderRadius: "50%",
+                  background: "var(--accent)",
+                  boxShadow: "0 0 8px var(--accent)",
+                }}
+              />
+              <span
+                style={{
+                  fontFamily: "var(--mono)",
+                  fontSize: "0.7rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  color: "var(--accent)",
+                }}
+              >
+                Aperçu en direct du pied de page
+              </span>
+            </div>
+
+            <div
+              style={{
+                padding: "1.5rem",
+                borderRadius: "var(--r-md)",
+                background: "var(--bg)",
+                border: "1px solid var(--border)",
+              }}
+            >
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                  gap: "1.5rem",
+                  alignItems: "center",
+                }}
+              >
+                {/* Identité */}
+                <div>
+                  <p
+                    style={{
+                      fontFamily: "var(--font-head)",
+                      fontSize: "1.1rem",
+                      fontWeight: 700,
+                      color: "var(--text)",
+                      margin: "0 0 4px",
+                    }}
+                  >
+                    {form.customName ? (
+                      form.customName
+                    ) : (
+                      <>
+                        {profileFirstName}{" "}
+                        <em style={{ color: "var(--accent)", fontStyle: "normal" }}>
+                          {profileLastName}
+                        </em>
+                      </>
+                    )}
+                  </p>
+                  <p
+                    style={{
+                      fontSize: "0.78rem",
+                      color: "var(--text-2)",
+                      margin: 0,
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    {form.tagline || "Développeur web & mobile — étudiant en Génie Logiciel."}
+                  </p>
+                </div>
+
+                {/* Copyright */}
+                <div style={{ textAlign: "center" }}>
+                  <p
+                    style={{
+                      fontSize: "0.78rem",
+                      color: "var(--text-2)",
+                      margin: 0,
+                    }}
+                  >
+                    © {year}{" "}
+                    <strong style={{ color: "var(--text)" }}>
+                      {form.customName || defaultDisplayName}
+                    </strong>
+                    . {form.copyrightText || "Tous droits réservés."}
+                  </p>
+                </div>
+
+                {/* Liens */}
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: "6px",
+                    justifyContent: "flex-end",
+                  }}
+                >
+                  {form.showGithub && (
+                    <span className="footer-link" style={{ pointerEvents: "none" }}>
+                      <GithubIcon width={13} height={13} /> GitHub{" "}
+                      <ArrowUpRightIcon width={10} height={10} />
+                    </span>
+                  )}
+                  {form.showLinkedin && (
+                    <span className="footer-link" style={{ pointerEvents: "none" }}>
+                      <LinkedinIcon width={13} height={13} /> LinkedIn{" "}
+                      <ArrowUpRightIcon width={10} height={10} />
+                    </span>
+                  )}
+                  {form.showWhatsapp && (
+                    <span className="footer-link" style={{ pointerEvents: "none" }}>
+                      <WhatsappIcon width={13} height={13} /> WhatsApp{" "}
+                      <ArrowUpRightIcon width={10} height={10} />
+                    </span>
+                  )}
+                  {form.showEmail && (
+                    <span className="footer-link" style={{ pointerEvents: "none" }}>
+                      <MailIcon width={13} height={13} /> Email{" "}
+                      <ArrowUpRightIcon width={10} height={10} />
+                    </span>
+                  )}
+                  {form.customLinks?.map((l, i) =>
+                    l.label ? (
+                      <span
+                        key={i}
+                        className="footer-link"
+                        style={{ pointerEvents: "none" }}
+                      >
+                        {l.label} <ArrowUpRightIcon width={10} height={10} />
+                      </span>
+                    ) : null
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Actions ── */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "1rem",
+              marginTop: "1rem",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+              <Btn onClick={handleSave} variant="primary">
+                {saving ? "Enregistrement..." : "Enregistrer le pied de page"}
+              </Btn>
+              {saved && (
+                <span
+                  style={{
+                    fontFamily: "var(--mono)",
+                    fontSize: "0.74rem",
+                    color: "var(--accent)",
+                  }}
+                >
+                  ✔ Enregistré
+                </span>
+              )}
+            </div>
+
+            <Btn onClick={handleReset} variant="ghost" small>
+              Rétablir par défaut
+            </Btn>
           </div>
         </div>
       )}

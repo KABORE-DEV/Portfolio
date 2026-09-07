@@ -1,4 +1,4 @@
-import { useCollection } from "../hooks/useFirestore.js";
+import { useCollection, useProfile } from "../hooks/useFirestore.js";
 import { PORTFOLIO } from "../data.js";
 import { GraduationIcon, ArrowDownIcon } from "../icons.jsx";
 import { TECH_ICONS } from "../techIcons.jsx";
@@ -73,9 +73,12 @@ function SkillBar({ skill }) {
 }
 
 export default function ResumePage() {
+  const { data: profile }    = useProfile();
   const { data: education }  = useCollection("education");
   const { data: experience } = useCollection("experience");
   const { data: skills }     = useCollection("skills");
+
+  const cvUrl = profile?.cvUrl || PORTFOLIO.personal.cvUrl || "/CV_Kabore_Frank.pdf";
 
   const allSkills = skills?.length ? skills : PORTFOLIO.skills;
   const languages  = allSkills.filter(s => s.category === "front" || s.category === "back");
@@ -95,7 +98,7 @@ export default function ResumePage() {
           <p className="section-desc" style={{ marginBottom: "1.75rem" }}>
             Formation, expériences et compétences professionnelles.
           </p>
-          <a href="/CV_Kabore_Frank.pdf" download className="btn btn-primary" id="resume-download-btn">
+          <a href={cvUrl} download="CV_Frank_KABORE.pdf" className="btn btn-primary" id="resume-download-btn">
             Télécharger le CV <ArrowDownIcon width={14} height={14} />
           </a>
         </div>

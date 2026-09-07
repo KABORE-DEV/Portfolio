@@ -122,3 +122,63 @@ export function useProfile() {
 
   return { data, loading, update, refresh: fetchData };
 }
+
+const FOOTER_CACHE_KEY = "portfolio-footer-cache";
+
+function cacheFooter(value) {
+  try {
+    localStorage.setItem(FOOTER_CACHE_KEY, JSON.stringify(value));
+  } catch (e) {
+    console.warn("Impossible de mettre le footer en cache local:", e);
+  }
+}
+
+/** Hook pour le document unique "footer" (single doc) avec fallback sur data.js */
+export function useFooter() {
+  const fallback = PORTFOLIO.footer || {};
+  const [data, setData] = useState(() => {
+    try {
+      const raw = localStorage.getItem(FOOTER_CACHE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const ref = doc(db, "footer", "main");
+      const snap = await getDoc(ref);
+      const next = snap.exists() ? { ...fallback, ...snap.data() } : fallback;
+      setData(next);
+      cacheFooter(next);
+    } catch (e) {
+      console.warn(`Firestore [footer] indisponible/vide, utilisation des données locales :`, e);
+      setData(fallback);
+      cacheFooter(fallback);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const update = async (item) => {
+    try {
+      await setDoc(doc(db, "footer", "main"), item, { merge: true });
+      const next = { ...(data || fallback), ...item };
+      setData(next);
+      cacheFooter(next);
+      return true;
+    } catch (e) {
+      console.error("Erreur de mise à jour du footer Firestore:", e);
+      return false;
+    }
+  };
+
+  return { data: data || fallback, loading, update, refresh: fetchData };
+}

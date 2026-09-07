@@ -37,6 +37,7 @@ export default function HomePage({ onNavigate }) {
   const { data: personal, loading: profileLoading } = useProfile();
   const { firstName, lastName, title, bio, initials, email, heroSubtitle, location } =
     personal || PORTFOLIO.personal;
+  const cvUrl = personal?.cvUrl || PORTFOLIO.personal.cvUrl || "/CV_Kabore_Frank.pdf";
   // Photo dispo immédiatement si en cache ; initiales seulement lors du tout premier chargement
   const photo =
     profileLoading && !personal ? null : (personal || PORTFOLIO.personal).photo;
@@ -109,7 +110,7 @@ export default function HomePage({ onNavigate }) {
               </button>
               <a
                 className="btn btn-ghost"
-                href="/CV_Kabore_Frank.pdf"
+                href={cvUrl}
                 download
                 aria-label="Télécharger CV"
               >

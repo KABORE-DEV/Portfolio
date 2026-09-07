@@ -17,12 +17,28 @@ export const PORTFOLIO = {
     bio: `Étudiant en 3ème année de génie logiciel, je crée des applications web & mobile simples, claires et efficaces.`,
     initials: "FK",
     photo: "/frank.jpg",
+    cvUrl: "/CV_Kabore_Frank.pdf",
   },
 
   social: {
     github: "https://github.com/KABORE-DEV",
     linkedin: "https://www.linkedin.com/in/frank-b-kabore-9117632b0/",
     whatsapp: "https://wa.me/22652766273",
+  },
+
+  footer: {
+    tagline: "Développeur web & mobile — étudiant en Génie Logiciel.",
+    copyrightText: "Tous droits réservés.",
+    customName: "",
+    showGithub: true,
+    showLinkedin: true,
+    showWhatsapp: false,
+    showEmail: false,
+    githubUrl: "https://github.com/KABORE-DEV",
+    linkedinUrl: "https://www.linkedin.com/in/frank-b-kabore-9117632b0/",
+    whatsappUrl: "https://wa.me/22652766273",
+    emailUrl: "kabore.dev@gmail.com",
+    customLinks: [],
   },
 
   skills: [

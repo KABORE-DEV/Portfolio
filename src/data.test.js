@@ -37,4 +37,13 @@ describe("data.js — intégrité des données", () => {
       if (pr.github) expect(pr.github.startsWith("https://")).toBe(true);
     }
   });
+
+  it("la configuration du footer et du CV par défaut est valide", () => {
+    expect(PORTFOLIO.personal.cvUrl).toBeTruthy();
+    expect(PORTFOLIO.footer).toBeDefined();
+    expect(typeof PORTFOLIO.footer.tagline).toBe("string");
+    expect(typeof PORTFOLIO.footer.copyrightText).toBe("string");
+    expect(typeof PORTFOLIO.footer.showGithub).toBe("boolean");
+    expect(typeof PORTFOLIO.footer.showLinkedin).toBe("boolean");
+  });
 });
