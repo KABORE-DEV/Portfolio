@@ -35,7 +35,7 @@ const PROCESS = [
 export default function HomePage({ onNavigate }) {
   const [selected, setSelected] = useState(null);
   const { data: personal, loading: profileLoading } = useProfile();
-  const { firstName, lastName, title, bio, initials, email } =
+  const { firstName, lastName, title, bio, initials, email, heroSubtitle, location } =
     personal || PORTFOLIO.personal;
   // Photo dispo immédiatement si en cache ; initiales seulement lors du tout premier chargement
   const photo =
@@ -89,8 +89,7 @@ export default function HomePage({ onNavigate }) {
               <span className="hero-line2">Développeur web &amp; mobile.</span>
             </h1>
             <p className="hero-sub">
-              Étudiant en Génie Logiciel, je conçois des sites et applications
-              web &amp; mobile.
+              {heroSubtitle || PORTFOLIO.personal.heroSubtitle}
             </p>
 
             <div className="hero-actions">
@@ -145,8 +144,8 @@ export default function HomePage({ onNavigate }) {
 
           {/* Photo */}
           <div className="hero-photo-wrap">
+            <div className="hero-photo-glow" aria-hidden="true" />
             <div className="hero-photo">
-              <div className="hero-photo-shift" aria-hidden="true" />
               <div className="hero-photo-img">
                 {photo ? (
                   <img src={photo} alt={`Photo de ${firstName} ${lastName}`} />
@@ -154,15 +153,17 @@ export default function HomePage({ onNavigate }) {
                   <div className="hero-photo-initials">{initials}</div>
                 )}
               </div>
+              <div className="hero-photo-overlay" aria-hidden="true" />
               <span className="hero-photo-status">
                 <i aria-hidden="true" /> Disponible
               </span>
-              <div className="hero-photo-caption">
-                <p className="hero-photo-name">
-                  {firstName} {lastName}
-                </p>
-                <p className="hero-photo-role">{title}</p>
-              </div>
+              <span className="hero-photo-location">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+                {location || "Burkina Faso"}
+              </span>
             </div>
           </div>
         </div>

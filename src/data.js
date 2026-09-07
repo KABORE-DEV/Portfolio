@@ -10,6 +10,7 @@ export const PORTFOLIO = {
     firstName: "Frank",
     lastName: "KABORE",
     title: "Étudiant en Génie Logiciel",
+    heroSubtitle: "Passionné par le code, je donne vie à des projets web et mobiles simples, rapides et agréables à utiliser.",
     email: "kabore.dev@gmail.com",
     phone: "+226 52 76 62 73 / 06 41 84 57",
     location: "Burkina Faso · Bobo-Dioulasso",

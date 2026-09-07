@@ -1257,6 +1257,13 @@ function ProfileSection() {
             onChange={set("title")}
             placeholder="Étudiant en Génie Logiciel"
           />
+          <TextArea
+            label="Phrase d'accroche d'accueil (Hero)"
+            value={form.heroSubtitle || ""}
+            onChange={set("heroSubtitle")}
+            placeholder="Passionné par le code, je donne vie à des projets web et mobiles..."
+            rows={2}
+          />
           <Input
             label="Email"
             type="email"

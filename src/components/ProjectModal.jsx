@@ -4,6 +4,12 @@ import { TECH_ICONS } from "../techIcons.jsx";
 import { ArrowUpRightIcon, GithubIcon } from "../icons.jsx";
 import { stopLenis, startLenis } from "../lib/scroll.js";
 
+function safeUrl(url) {
+  if (!url || typeof url !== "string") return null;
+  const trimmed = url.trim();
+  return /^https?:\/\//i.test(trimmed) ? trimmed : null;
+}
+
 export default function ProjectModal({ project, onClose }) {
   useEffect(() => {
     if (!project) return;
@@ -63,13 +69,13 @@ export default function ProjectModal({ project, onClose }) {
           )}
 
           <div className="modal-links" style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", marginTop: "2rem" }}>
-            {project.demo && (
-              <a href={project.demo} target="_blank" rel="noreferrer" className="btn btn-primary">
+            {safeUrl(project.demo) && (
+              <a href={safeUrl(project.demo)} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
                 Voir la démo <ArrowUpRightIcon width={14} height={14} />
               </a>
             )}
-            {project.github && (
-              <a href={project.github} target="_blank" rel="noreferrer" className="btn btn-ghost">
+            {safeUrl(project.github) && (
+              <a href={safeUrl(project.github)} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">
                 <GithubIcon width={14} height={14} /> GitHub
               </a>
             )}
