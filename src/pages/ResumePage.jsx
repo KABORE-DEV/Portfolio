@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { useCollection, useProfile } from "../hooks/useFirestore.js";
 import { PORTFOLIO } from "../data.js";
-import { GraduationIcon, ArrowDownIcon } from "../icons.jsx";
+import { GraduationIcon, ArrowDownIcon, ArrowUpRightIcon } from "../icons.jsx";
 import { TECH_ICONS } from "../techIcons.jsx";
 import { motion } from "framer-motion";
 import { viewportOnce } from "../motion.js";
+import CvModal from "../components/CvModal.jsx";
 
 function TimelineItem({ item, type }) {
   const title = type === "education" ? item.degree : item.role;
@@ -73,10 +75,12 @@ function SkillBar({ skill }) {
 }
 
 export default function ResumePage() {
+  const [cvOpen, setCvOpen]  = useState(false);
   const { data: profile }    = useProfile();
   const { data: education }  = useCollection("education");
   const { data: experience } = useCollection("experience");
   const { data: skills }     = useCollection("skills");
+  const { data: certifications } = useCollection("certifications");
 
   const cvUrl = profile?.cvUrl || PORTFOLIO.personal.cvUrl || "/CV_Kabore_Frank.pdf";
 
@@ -87,20 +91,39 @@ export default function ResumePage() {
 
   const edu = education?.length ? education : PORTFOLIO.education;
   const exp = experience?.length ? experience : PORTFOLIO.experience;
+  const certs = certifications?.length ? certifications : (PORTFOLIO.certifications || []);
 
   return (
     <>
+      <CvModal isOpen={cvOpen} onClose={() => setCvOpen(false)} cvUrl={cvUrl} />
+
       {/* ═══ HEADER ═════════════════════════ */}
       <div className="page-head">
         <div className="container">
           <span className="section-num">Parcours</span>
           <h1 className="section-title"><em>Mon</em> parcours.</h1>
           <p className="section-desc" style={{ marginBottom: "1.75rem" }}>
-            Formation, expériences et compétences professionnelles.
+            Formation, expériences, compétences et certifications professionnelles.
           </p>
-          <a href={cvUrl} download="CV_Frank_KABORE.pdf" className="btn btn-primary" id="resume-download-btn">
-            Télécharger le CV <ArrowDownIcon width={14} height={14} />
-          </a>
+          <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+            <button
+              onClick={() => setCvOpen(true)}
+              className="btn btn-primary"
+              id="resume-preview-btn"
+              style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+            >
+              Aperçu du CV <ArrowUpRightIcon width={14} height={14} />
+            </button>
+            <a
+              href={cvUrl}
+              download="CV_Frank_KABORE.pdf"
+              className="btn btn-ghost"
+              id="resume-download-btn"
+              style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
+            >
+              Télécharger le CV <ArrowDownIcon width={14} height={14} />
+            </a>
+          </div>
         </div>
       </div>
 
@@ -188,6 +211,59 @@ export default function ResumePage() {
               </div>
             </div>
           </div>
+
+          {/* ═══ CERTIFICATIONS VÉRIFIÉES ═════ */}
+          {certs?.length > 0 && (
+            <div className="skills-card" style={{ marginTop: "2.5rem" }}>
+              <div className="section-head" style={{ marginBottom: "1.75rem" }}>
+                <span className="section-num">Accréditations</span>
+                <h2 className="section-title">Certifications <em>professionnelles.</em></h2>
+              </div>
+              <div className="certs-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1rem" }}>
+                {certs.map((c, idx) => (
+                  <div
+                    key={idx}
+                    className="cert-card"
+                    style={{
+                      background: "var(--surface)",
+                      border: "1px solid var(--border)",
+                      borderRadius: "var(--r-lg)",
+                      padding: "1.25rem",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      gap: "0.85rem",
+                    }}
+                  >
+                    <div>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.5rem", marginBottom: "0.5rem" }}>
+                        <span style={{ fontFamily: "var(--mono)", fontSize: "0.68rem", fontWeight: 700, color: "var(--terra)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                          {c.issuer}
+                        </span>
+                        <span style={{ fontFamily: "var(--mono)", fontSize: "0.68rem", color: "var(--text-3)" }}>
+                          {c.date}
+                        </span>
+                      </div>
+                      <h4 style={{ fontFamily: "var(--font-head)", fontSize: "0.98rem", fontWeight: 700, color: "var(--text)", lineHeight: 1.3 }}>
+                        {c.title}
+                      </h4>
+                    </div>
+                    {c.url && (
+                      <a
+                        href={c.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-ghost btn-sm"
+                        style={{ alignSelf: "flex-start", fontSize: "0.72rem", padding: "0.4rem 0.8rem", display: "inline-flex", alignItems: "center", gap: "4px" }}
+                      >
+                        Vérifier l'accréditation <ArrowUpRightIcon width={12} height={12} />
+                      </a>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
         </div>
       </div>

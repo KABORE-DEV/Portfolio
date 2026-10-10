@@ -118,6 +118,27 @@ export const PORTFOLIO = {
 
   projects: [
     {
+      title: "MyPasso",
+      description:
+        "Application web de gestion de projets et de tâches — développée durant mon stage chez Kuilinga Technologies.",
+      longDescription:
+        "MyPasso est une application web de gestion de projets réalisée dans le cadre de mon stage chez Kuilinga Technologies. L'interface permet aux équipes de créer des projets, d'assigner des tâches, de suivre l'avancement et de collaborer en temps réel. Développée avec Laravel (back-end MVC, API RESTful) et React (front-end SPA), avec une base de données MySQL.",
+      features: [
+        "Gestion de projets & tâches",
+        "Attribution par membres d'équipe",
+        "Tableau de bord d'avancement",
+        "Interface React SPA",
+        "API RESTful Laravel",
+        "Design responsive",
+      ],
+      technologies: ["Laravel", "React", "MySQL"],
+      github: null,
+      demo: "https://mypasso.shop",
+      featured: true,
+      status: "En ligne",
+      image: "/projects/mypasso.png",
+    },
+    {
       title: "La Voix de Korsimoro",
       description:
         "Site web d'un média en ligne local — actualités, articles et rubriques culturelles.",
@@ -130,11 +151,12 @@ export const PORTFOLIO = {
       ],
       technologies: ["Laravel"],
       github: "https://github.com/KABORE-DEV/Cleaning_Services",
-      demo: "https://la-voix-de-korsimoro.vercel.app",
+      demo: null,
       featured: true,
-      status: "En ligne",
+      status: "En développement",
       image: "/projects/korsimoro.png",
     },
+
     {
       title: "Faso Pagnes",
       description:

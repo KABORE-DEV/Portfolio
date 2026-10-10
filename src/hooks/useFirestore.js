@@ -182,3 +182,40 @@ export function useFooter() {
 
   return { data: data || fallback, loading, update, refresh: fetchData };
 }
+
+/** Hook pour les paramètres généraux du site (document unique "settings/main") */
+export function useSettings() {
+  const fallback = {};
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const ref = doc(db, "settings", "main");
+      const snap = await getDoc(ref);
+      setData(snap.exists() ? snap.data() : fallback);
+    } catch (e) {
+      console.warn("Firestore [settings] indisponible:", e);
+      setData(fallback);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+
+  const update = async (item) => {
+    try {
+      await setDoc(doc(db, "settings", "main"), item, { merge: true });
+      setData(prev => ({ ...(prev || {}), ...item }));
+      return true;
+    } catch (e) {
+      console.error("Erreur de mise à jour des settings Firestore:", e);
+      return false;
+    }
+  };
+
+  return { data: data || fallback, loading, update, refresh: fetchData };
+}
+

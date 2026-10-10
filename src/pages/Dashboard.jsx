@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { collection, getDocs, addDoc, updateDoc } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContext";
-import { useCollection, useProfile, useFooter } from "../hooks/useFirestore";
+import { useCollection, useProfile, useFooter, useSettings } from "../hooks/useFirestore";
 import { TECH_ICONS } from "../techIcons.jsx";
 import {
   RocketIcon,
@@ -1982,9 +1982,165 @@ function FooterSection() {
 }
 
 /* ═══════════════════════════════════════
+   Section — Paramètres Page d'Accueil (projet vedette)
+═══════════════════════════════════════ */
+
+function HomeSettingsSection() {
+  const { data: settings, update: updateSettings, loading: settingsLoading } = useSettings();
+  const { data: projectsData } = useCollection("projects");
+  const allProjects = projectsData?.length ? projectsData : PORTFOLIO.projects;
+
+  const [featuredId, setFeaturedId] = useState("");
+  const [saved, setSaved] = useState(false);
+
+  // Sync from Firestore when loaded
+  useEffect(() => {
+    if (!settingsLoading && settings?.featuredCaseId !== undefined) {
+      setFeaturedId(settings.featuredCaseId || "");
+    }
+  }, [settingsLoading, settings]);
+
+  const handleSave = async () => {
+    const ok = await updateSettings({ featuredCaseId: featuredId });
+    if (ok) {
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    }
+  };
+
+  const selectedProject = featuredId
+    ? allProjects.find((p) => (p.id || p.title) === featuredId)
+    : null;
+
+  return (
+    <div>
+      <SectionHeader
+        title="Page d'accueil"
+        count={null}
+        onAdd={null}
+      />
+
+      <div style={{ maxWidth: "600px" }}>
+        {/* Description */}
+        <div style={{
+          background: "var(--terra-glow)",
+          border: "1px solid var(--terra-border)",
+          borderRadius: "var(--r-md)",
+          padding: "0.9rem 1.1rem",
+          marginBottom: "2rem",
+          fontSize: "0.85rem",
+          color: "var(--terra)",
+          lineHeight: 1.6,
+        }}>
+          <strong>Projet vedette</strong> — choisissez quel projet sera mis en avant
+          dans la section « 02 · Étude de cas» de la page d'accueil.
+        </div>
+
+        {/* Sélecteur */}
+        <div style={{ marginBottom: "1.5rem" }}>
+          <label style={labelStyle}>Projet affiché comme étude de cas</label>
+          <select
+            value={featuredId}
+            onChange={(e) => setFeaturedId(e.target.value)}
+            style={{ ...inputStyle, cursor: "pointer" }}
+            onFocus={focusOn}
+            onBlur={focusOff}
+          >
+            <option value="" style={{ background: "var(--bg)" }}>
+              — Par défaut (premier projet avec demo en ligne) —
+            </option>
+            {allProjects.map((p) => (
+              <option
+                key={p.id || p.title}
+                value={p.id || p.title}
+                style={{ background: "var(--bg)" }}
+              >
+                {p.title}{p.status ? ` · ${p.status}` : ""}{p.demo ? " ↗" : ""}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Aperçu */}
+        {selectedProject && (
+          <div style={{
+            background: "var(--glass-bg)",
+            border: "1px solid var(--glass-border)",
+            borderRadius: "var(--r-lg)",
+            padding: "1.1rem 1.25rem",
+            marginBottom: "1.5rem",
+          }}>
+            <p style={{ fontFamily: "var(--mono)", fontSize: "0.66rem", textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--text-3)", margin: "0 0 6px" }}>Aperçu sélectionné</p>
+            <p style={{ fontWeight: 700, fontSize: "1rem", color: "var(--text)", margin: "0 0 4px" }}>{selectedProject.title}</p>
+            <p style={{ fontSize: "0.82rem", color: "var(--text-2)", margin: "0 0 6px" }}>{selectedProject.description}</p>
+            <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+              {(Array.isArray(selectedProject.technologies)
+                ? selectedProject.technologies
+                : (selectedProject.technologies || "").split(",")
+              ).filter(Boolean).map((t) => (
+                <span key={t} style={{
+                  fontFamily: "var(--mono)",
+                  fontSize: "0.7rem",
+                  fontWeight: 700,
+                  background: "var(--accent-glow)",
+                  color: "var(--accent)",
+                  borderRadius: "var(--r-full)",
+                  padding: "2px 10px",
+                  border: "1px solid var(--accent-border)",
+                }}>{t.trim()}</span>
+              ))}
+              {selectedProject.status && (
+                <span style={{
+                  fontFamily: "var(--mono)",
+                  fontSize: "0.7rem",
+                  fontWeight: 700,
+                  background: selectedProject.demo ? "rgba(78,222,163,0.12)" : "var(--surface-2)",
+                  color: selectedProject.demo ? "var(--accent)" : "var(--text-3)",
+                  borderRadius: "var(--r-full)",
+                  padding: "2px 10px",
+                  border: "1px solid var(--border)",
+                }}>{selectedProject.status}</span>
+              )}
+            </div>
+            {selectedProject.demo && (
+              <a
+                href={selectedProject.demo}
+                target="_blank"
+                rel="noreferrer"
+                style={{ display: "inline-flex", alignItems: "center", gap: "4px", marginTop: "0.6rem", fontFamily: "var(--mono)", fontSize: "0.72rem", color: "var(--accent)", textDecoration: "none" }}
+              >
+                {selectedProject.demo} <ArrowUpRightIcon width={11} height={11} />
+              </a>
+            )}
+          </div>
+        )}
+
+        {/* Bouton enregistrer */}
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <Btn onClick={handleSave} variant="primary">
+            Enregistrer
+          </Btn>
+          {saved && (
+            <span style={{ fontFamily: "var(--mono)", fontSize: "0.74rem", color: "var(--accent)" }}>
+              ✔ Projet vedette mis à jour
+            </span>
+          )}
+        </div>
+
+        {/* Info */}
+        <p style={{ marginTop: "1.25rem", fontFamily: "var(--mono)", fontSize: "0.7rem", color: "var(--text-3)", lineHeight: 1.6 }}>
+          La modification prend effet immédiatement sur le site. Si aucun projet n'est sélectionné, le système affichera automatiquement le premier projet avec une URL de demo disponible.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════
    Dashboard principal
 ═══════════════════════════════════════ */
 const tabs = [
+  { key: "homepage", label: "Page d'accueil" },
   { key: "profile", label: "Profil" },
   { key: "projects", label: "Projets" },
   { key: "skills", label: "Compétences" },
@@ -2442,6 +2598,7 @@ export default function Dashboard({ onBack }) {
                 minHeight: "60vh",
               }}
             >
+              {activeTab === "homepage" && <HomeSettingsSection />}
               {activeTab === "profile" && <ProfileSection />}
               {activeTab === "projects" && <ProjectsSection confirmDelete={confirmDelete} />}
               {activeTab === "skills" && <SkillsSection confirmDelete={confirmDelete} />}

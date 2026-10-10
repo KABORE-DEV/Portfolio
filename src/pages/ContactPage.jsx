@@ -13,9 +13,18 @@ export default function ContactPage() {
   } = profile;
   const { github, linkedin, whatsapp } = PORTFOLIO.social;
 
+  const [copiedEmail, setCopiedEmail] = useState(false);
   const [form, setForm]     = useState({ prenom: "", name: "", email: "", subject: "", message: "" });
   const [status, setStatus] = useState(null);
   const [errors, setErrors] = useState({ prenom: "", name: "", email: "", subject: "", message: "" });
+
+  const handleCopyEmail = () => {
+    if (email) {
+      navigator.clipboard.writeText(email);
+      setCopiedEmail(true);
+      setTimeout(() => setCopiedEmail(false), 2500);
+    }
+  };
 
   const handleChange = (key) => (e) => {
     setForm(f => ({ ...f, [key]: e.target.value }));
@@ -65,11 +74,49 @@ export default function ContactPage() {
 
           {/* ── Infos ─────────────────────── */}
           <div>
+            <div style={{
+              background: "var(--surface)",
+              border: "1px solid var(--terra-border)",
+              borderRadius: "var(--r-lg)",
+              padding: "1.25rem",
+              marginBottom: "1.75rem",
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.5rem"
+            }}>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", fontFamily: "var(--mono)", fontSize: "0.7rem", fontWeight: 700, textTransform: "uppercase", color: "var(--terra)" }}>
+                <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: "currentColor", display: "inline-block" }} />
+                Statut actuel
+              </div>
+              <p style={{ fontSize: "0.92rem", color: "var(--text)", fontWeight: 600, margin: 0 }}>
+                Disponible pour stage ou opportunité professionnelle
+              </p>
+              <p style={{ fontSize: "0.82rem", color: "var(--text-2)", margin: 0 }}>
+                Bobo-Dioulasso, Burkina Faso &amp; ouvert au télétravail.
+              </p>
+            </div>
+
             <div className="contact-list">
               <div className="contact-item">
                 <span className="k">Email</span>
-                <div className="v">
+                <div className="v" style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
                   <a className="email-big" href={`mailto:${email}`}>{email}</a>
+                  <button
+                    type="button"
+                    onClick={handleCopyEmail}
+                    className="social-chip"
+                    style={{
+                      fontFamily: "var(--mono)",
+                      fontSize: "0.72rem",
+                      cursor: "pointer",
+                      background: copiedEmail ? "var(--terra-glow)" : undefined,
+                      color: copiedEmail ? "var(--terra)" : undefined,
+                      borderColor: copiedEmail ? "var(--terra-border)" : undefined,
+                    }}
+                    title="Copier l'adresse email"
+                  >
+                    {copiedEmail ? "✓ Copié !" : "Copier"}
+                  </button>
                 </div>
               </div>
               <div className="contact-item">
@@ -83,15 +130,33 @@ export default function ContactPage() {
             </div>
 
             <p style={{ fontFamily: "var(--mono)", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "var(--text-3)", margin: "2.25rem 0 1rem" }}>
-              Réseaux
+              Réseaux &amp; Messagerie directe
             </p>
-            <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap", marginBottom: "1.25rem" }}>
               {socials.map(s => (
                 <a key={s.label} className="social-chip" href={s.href} target="_blank" rel="noreferrer" aria-label={s.label}>
                   {s.icon} {s.label}
                 </a>
               ))}
             </div>
+
+            {whatsapp && (
+              <a
+                href={`${whatsapp}?text=${encodeURIComponent("Bonjour Frank, j'ai consulté votre portfolio et j'aimerais échanger avec vous.")}`}
+                target="_blank"
+                rel="noreferrer"
+                className="btn btn-ghost"
+                style={{
+                  width: "100%",
+                  justifyContent: "center",
+                  borderColor: "var(--terra-border)",
+                  color: "var(--terra)",
+                  gap: "0.5rem"
+                }}
+              >
+                <WhatsappIcon width={16} height={16} /> Discuter directement sur WhatsApp
+              </a>
+            )}
           </div>
 
           {/* ── Formulaire ────────────────── */}

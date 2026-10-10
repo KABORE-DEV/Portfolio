@@ -55,6 +55,22 @@ export default function ProjectModal({ project, onClose }) {
           
           <p className="modal-desc" style={{ marginTop: "1.5rem" }}>{project.longDescription || project.description}</p>
 
+          {project.features?.length > 0 && (
+            <div className="modal-features-section" style={{ marginTop: "1.75rem" }}>
+              <h4 style={{ fontFamily: "var(--mono)", fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: "0.12em", color: "var(--text-3)", marginBottom: "0.75rem" }}>
+                Fonctionnalités clés
+              </h4>
+              <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                {project.features.map((f, idx) => (
+                  <li key={idx} style={{ display: "flex", alignItems: "flex-start", gap: "0.6rem", fontSize: "0.92rem", color: "var(--text-2)", lineHeight: 1.5 }}>
+                    <span style={{ color: "var(--terra)", fontWeight: 700, flexShrink: 0 }}>✓</span>
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {project.technologies?.length > 0 && (
             <div className="modal-tech-list" style={{ marginTop: "2rem" }}>
               <div className="tags">

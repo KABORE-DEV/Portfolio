@@ -70,41 +70,14 @@ function HamburgerIcon({ open }) {
 /* ── Navbar ─────────────────────────────────────── */
 function Navbar({ activePage, navigate, mobileOpen, setMobileOpen }) {
   const { theme, toggleTheme } = useTheme();
-  const [visible, setVisible] = useState(true);
   const [scrolled, setScrolled] = useState(false);
 
-  /* Détection intelligente du scroll pour afficher/masquer la barre flottante */
+  /* Toujours visible — seul l'effet de fond scrolled est conservé */
   useEffect(() => {
-    let prevY = window.scrollY;
-    let ticking = false;
-
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const currentY = window.scrollY;
-          setScrolled(currentY > 20);
-
-          if (currentY <= 60) {
-            // Toujours visible en haut de page
-            setVisible(true);
-          } else if (currentY > prevY + 6) {
-            // Scroll vers le bas -> masquer la barre
-            if (!mobileOpen) setVisible(false);
-          } else if (currentY < prevY - 6) {
-            // Scroll vers le haut -> réafficher immédiatement
-            setVisible(true);
-          }
-
-          prevY = currentY;
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [mobileOpen]);
+  }, []);
 
   /* Secret admin : triple-clic sur le logo */
   const [logoClicks, setLogoClicks] = useState(0);
@@ -117,7 +90,7 @@ function Navbar({ activePage, navigate, mobileOpen, setMobileOpen }) {
 
   return (
     <nav
-      className={`navbar ${!visible ? "nav-scrolled-hidden" : ""} ${scrolled ? "nav-scrolled" : ""} ${mobileOpen ? "nav-hidden" : ""}`}
+      className={`navbar ${scrolled ? "nav-scrolled" : ""} ${mobileOpen ? "nav-hidden" : ""}`}
       aria-label="Navigation principale"
     >
       {/* Logo */}
