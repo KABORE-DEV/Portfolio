@@ -1,6 +1,8 @@
-import { useState, Suspense, lazy } from "react";
+import { useState, useEffect, Suspense, lazy } from "react";
 import { ThemeProvider, useTheme } from "./contexts/ThemeContext.jsx";
 import { AuthProvider, useAuth } from "./contexts/AuthContext.jsx";
+import { PORTFOLIO } from "./data.js";
+import { useProfile } from "./hooks/useFirestore.js";
 import HomePage from "./pages/HomePage.jsx";
 import ResumePage from "./pages/ResumePage.jsx";
 import PortfolioPage from "./pages/PortfolioPage.jsx";
@@ -106,44 +108,137 @@ function Navbar({ activePage, navigate, mobileOpen, setMobileOpen }) {
   );
 }
 
-/* ── Mobile Drawer ──────────────────────────────── */
+/* ── Mobile Menu Modal (Kuilinga Style) ─────────────── */
 function MobileDrawer({ activePage, navigate, open, onClose }) {
   const { theme, toggleTheme } = useTheme();
+  const { data: personal } = useProfile();
+  const cvUrl = personal?.cvUrl || PORTFOLIO.personal.cvUrl || "/CV_Kabore_Frank.pdf";
+
+  // Verrouiller le défilement d'arrière-plan et gérer Escape
+  useEffect(() => {
+    if (open) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      const onKey = (e) => {
+        if (e.key === "Escape") onClose();
+      };
+      window.addEventListener("keydown", onKey);
+      return () => {
+        document.body.style.overflow = prev;
+        window.removeEventListener("keydown", onKey);
+      };
+    }
+  }, [open, onClose]);
+
   return (
-    <>
-      <div className={`mobile-menu-backdrop ${open ? "open" : ""}`} onClick={onClose} aria-hidden="true" />
-      <div className={`mobile-menu ${open ? "open" : ""}`} role="dialog" aria-modal="true" aria-label="Menu navigation">
-        <div className="mobile-menu-header">
-          <span className="mobile-menu-title">Navigation</span>
-          <button className="mobile-menu-close" onClick={onClose} aria-label="Fermer"><CloseIco /></button>
-        </div>
-        {NAV.map(n => (
-          <button
-            key={n.id}
-            onClick={() => { navigate(n.id); onClose(); }}
-            className={`mobile-nav-link ${activePage === n.id ? "active" : ""}`}
-            aria-current={activePage === n.id ? "page" : undefined}
+    <div
+      className={`mobile-menu-overlay ${open ? "open" : ""}`}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Menu de navigation"
+    >
+      <div className="mobile-menu-content">
+        {/* En-tête : Logo / Nom & Bouton Fermer */}
+        <div className="mobile-menu-topbar">
+          <div
+            className="mobile-menu-brand"
+            onClick={() => { navigate("home"); onClose(); }}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === "Enter" && (navigate("home"), onClose())}
           >
-            <span className="mobile-nav-icon">{n.icon}</span>
-            {n.label}
+            <span className="nav-logo-badge" aria-hidden="true">
+              <Monogram />
+            </span>
+            <div className="mobile-menu-brand-text">
+              <span className="mobile-menu-brand-name">Frank KABORE</span>
+              <span className="mobile-menu-brand-tag">Génie Logiciel</span>
+            </div>
+          </div>
+
+          <button
+            className="mobile-menu-close"
+            onClick={onClose}
+            aria-label="Fermer le menu"
+          >
+            <CloseIco />
           </button>
-        ))}
+        </div>
+
+        {/* Carte Centrale Flottante */}
+        <div className="mobile-menu-card">
+          <div className="mobile-nav-list" role="list">
+            {NAV.map((n) => {
+              const isActive = activePage === n.id;
+              return (
+                <button
+                  key={n.id}
+                  role="listitem"
+                  onClick={() => {
+                    navigate(n.id);
+                    onClose();
+                  }}
+                  className={`mobile-nav-item ${isActive ? "active" : ""}`}
+                  aria-current={isActive ? "page" : undefined}
+                >
+                  <span>{n.label}</span>
+                  {isActive && (
+                    <span className="mobile-nav-active-dot" aria-hidden="true" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Boutons d'Action */}
+          <div className="mobile-card-actions">
+            <button
+              className="mobile-btn-primary"
+              onClick={() => {
+                navigate("contact");
+                onClose();
+              }}
+            >
+              <span>Démarrer un projet</span>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </button>
+
+            {cvUrl && (
+              <a
+                href={cvUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mobile-btn-secondary"
+                onClick={onClose}
+              >
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                <span>Télécharger mon CV</span>
+              </a>
+            )}
+          </div>
+        </div>
+
+        {/* Sélecteur de Thème */}
         <button
           onClick={toggleTheme}
-          style={{
-            marginTop: "auto", paddingTop: "2rem",
-            display: "flex", alignItems: "center", gap: "0.75rem",
-            background: "none", border: "none", cursor: "pointer",
-            color: "var(--text-2)", fontFamily: "var(--mono)",
-            fontSize: "0.68rem", fontWeight: 700,
-            letterSpacing: "0.1em", textTransform: "uppercase",
-          }}
+          className="mobile-menu-theme-btn"
+          aria-label="Changer de thème"
         >
           {theme === "dark" ? <SunIco /> : <MoonIco />}
-          {theme === "dark" ? "Mode Clair" : "Mode Sombre"}
+          <span>{theme === "dark" ? "Mode Clair" : "Mode Sombre"}</span>
         </button>
       </div>
-    </>
+    </div>
   );
 }
 
