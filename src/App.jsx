@@ -56,9 +56,56 @@ function AdminSection({ onBack }) {
   );
 }
 
+/* ── Animated Hamburger Icon ────────────────────── */
+function HamburgerIcon({ open }) {
+  return (
+    <span className={`hamburger-box ${open ? "open" : ""}`} aria-hidden="true">
+      <span className="hamburger-bar top" />
+      <span className="hamburger-bar middle" />
+      <span className="hamburger-bar bottom" />
+    </span>
+  );
+}
+
 /* ── Navbar ─────────────────────────────────────── */
 function Navbar({ activePage, navigate, mobileOpen, setMobileOpen }) {
   const { theme, toggleTheme } = useTheme();
+  const [visible, setVisible] = useState(true);
+  const [scrolled, setScrolled] = useState(false);
+
+  /* Détection intelligente du scroll pour afficher/masquer la barre flottante */
+  useEffect(() => {
+    let prevY = window.scrollY;
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentY = window.scrollY;
+          setScrolled(currentY > 20);
+
+          if (currentY <= 60) {
+            // Toujours visible en haut de page
+            setVisible(true);
+          } else if (currentY > prevY + 6) {
+            // Scroll vers le bas -> masquer la barre
+            if (!mobileOpen) setVisible(false);
+          } else if (currentY < prevY - 6) {
+            // Scroll vers le haut -> réafficher immédiatement
+            setVisible(true);
+          }
+
+          prevY = currentY;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [mobileOpen]);
+
   /* Secret admin : triple-clic sur le logo */
   const [logoClicks, setLogoClicks] = useState(0);
   const handleLogoClick = () => {
@@ -69,10 +116,14 @@ function Navbar({ activePage, navigate, mobileOpen, setMobileOpen }) {
   };
 
   return (
-    <nav className="navbar" aria-label="Navigation principale">
+    <nav
+      className={`navbar ${!visible ? "nav-scrolled-hidden" : ""} ${scrolled ? "nav-scrolled" : ""} ${mobileOpen ? "nav-hidden" : ""}`}
+      aria-label="Navigation principale"
+    >
       {/* Logo */}
       <div className="nav-logo" onClick={handleLogoClick} title="Frank KABORE" aria-label="Accueil" role="button" tabIndex={0} onKeyDown={e => e.key === "Enter" && handleLogoClick()}>
         <span className="nav-logo-badge" aria-hidden="true"><Monogram /></span>
+        <span className="nav-logo-text">Frank KABORE</span>
       </div>
 
       {/* Desktop links */}
@@ -96,12 +147,12 @@ function Navbar({ activePage, navigate, mobileOpen, setMobileOpen }) {
           {theme === "dark" ? <SunIco /> : <MoonIco />}
         </button>
         <button
-          className="nav-hamburger"
+          className={`nav-hamburger ${mobileOpen ? "open" : ""}`}
           onClick={() => setMobileOpen(v => !v)}
-          aria-label="Menu mobile"
+          aria-label={mobileOpen ? "Fermer le menu" : "Menu mobile"}
           aria-expanded={mobileOpen}
         >
-          {mobileOpen ? <CloseIco /> : <MenuIco />}
+          <HamburgerIcon open={mobileOpen} />
         </button>
       </div>
     </nav>
@@ -141,7 +192,7 @@ function MobileDrawer({ activePage, navigate, open, onClose }) {
       aria-label="Menu de navigation"
     >
       <div className="mobile-menu-content">
-        {/* En-tête : Logo / Nom & Bouton Fermer */}
+        {/* En-tête : Logo à gauche + Bouton Fermer à droite (Style Photo 1 Kuilinga) */}
         <div className="mobile-menu-topbar">
           <div
             className="mobile-menu-brand"
@@ -159,13 +210,22 @@ function MobileDrawer({ activePage, navigate, open, onClose }) {
             </div>
           </div>
 
-          <button
-            className="mobile-menu-close"
-            onClick={onClose}
-            aria-label="Fermer le menu"
-          >
-            <CloseIco />
-          </button>
+          <div className="mobile-topbar-actions">
+            <button
+              onClick={toggleTheme}
+              className="nav-theme-btn"
+              aria-label="Changer de thème"
+            >
+              {theme === "dark" ? <SunIco /> : <MoonIco />}
+            </button>
+            <button
+              className="mobile-menu-close"
+              onClick={onClose}
+              aria-label="Fermer le menu"
+            >
+              <CloseIco />
+            </button>
+          </div>
         </div>
 
         {/* Carte Centrale Flottante */}
